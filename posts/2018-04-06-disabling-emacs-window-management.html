@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - Disabling emacs window management</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="../index.html">Home</a>
+            <a href="../posts.html">All Posts</a>
+            <a href="../contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="../tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>Disabling emacs window management</h1>
+<div class="soft">
+    How to force emacs to cede some control to the window manager.<br />
+    April  6, 2018 (<a href="../tags/programming.html">programming</a>, <a href="../tags/emacs.html">emacs</a>, <a href="../tags/i3.html">i3</a>)
+</div>
+
+<p>I use Emacs, which is mostly great. However I also use <a href="https://i3wm.org">i3</a>, a tiling window manager, and there’s a little bit of overlap. Emacs can split frames into multiple windows and shuffle things around - but so can i3, and in fact that’s specifically what i3 is built for.</p>
+<p>I resolve this tension pretty heavy-handedly. I use only i3 for placing windows. Emacs is stripped of all power to split frames.</p>
+<p>Here’s how I get emacs to behave (annotated from <a href="https://github.com/anderspapitto/nixos-configuration/blob/master/config/init.el">my init.el</a>.</p>
+<p>The main part is configuring <code>display-buffer-alist</code>, which controls what happens when emacs wants to display a buffer.</p>
+<pre><code>(setq display-buffer-alist
+      '((&quot;shell.*&quot; (display-buffer-same-window) ())
+        (&quot;.*&quot; (display-buffer-reuse-window
+               display-buffer-same-window
+               display-buffer-pop-up-frame)
+         (reusable-frames . t))))</code></pre>
+<p>This tells emacs to always raise an existing window that’s already displaying the buffer, if one exists, and otherwise to display it in the current window. There’s a slight exception for shells - when I switch to them I want them to always display in the current window, even if there’s another frame somewhere already displaying them.</p>
+<p>I override <code>display-buffer-pop-up-window</code>, which is used by some code that really wants to split the window (for example displaying grep results), to instead use the whole thing.</p>
+<pre><code>(defun anders/same-window-instead
+    (orig-fun buffer alist)
+  (display-buffer-same-window buffer nil))
+(advice-add 'display-buffer-pop-up-window :around 'anders/same-window-instead)</code></pre>
+<p>I’ve forgotten exactly what this does - but I think it tells emacs to switch to the frame that’s already displaying whatever I want to look at, if such a frame exists.</p>
+<pre><code>(defun anders/do-select-frame (orig-fun buffer &amp;rest args)
+  (let* ((old-frame (selected-frame))
+         (window (apply orig-fun buffer args))
+         (frame (window-frame window)))
+    (unless (eq frame old-frame)
+      (select-frame-set-input-focus frame))
+    (select-window window)
+    window))
+(advice-add 'display-buffer :around 'anders/do-select-frame)</code></pre>
+<p>I make transient frames (I have certain utilities that pop up a temporary frame) go away entirely when they’re done.</p>
+<pre><code>(setq frame-auto-hide-function 'delete-frame)</code></pre>
+<p>I completely neuter dedicated window functionality. I don’t need it, since I’m explicitly controlling all window placement anyways, and dedicated windows override a bunch of behavior and break all the other customizations.</p>
+<pre><code>(advice-add 'set-window-dedicated-p :around
+            (lambda (orig-fun &amp;rest args) nil))</code></pre>
+<p>There are also some package-specific fixes.</p>
+<p>Org mode</p>
+<pre><code>  (setq org-agenda-window-setup 'current-window)</code></pre>
+<p>Gdb</p>
+<pre><code>(setq gdb-display-io-nopopup t)</code></pre>
+<p>Compile. <code>compilation-goto-locus</code> (for jumping to compile errors or grep results) is a huge offender here. It overrides <code>display-buffer-alist</code> with a <code>let</code> binding deep inside it’s internals. There’s nothing for it but to override the whole function with a stripped-down version (still pretty long but look at the original - it’s a real beast).</p>
+<pre><code>  (defun compilation-goto-locus (msg mk end-mk)
+    &quot;Jump to an error corresponding to MSG at MK.
+All arguments are markers.  If END-MK is non-nil, mark is set there
+and overlay is highlighted between MK and END-MK.&quot;
+
+    (display-buffer (marker-buffer msg) '(nil (allow-no-window . t)))
+    (with-current-buffer (marker-buffer msg)
+      (goto-char (marker-position msg))
+      (and w (compilation-set-window w msg)))
+
+    (display-buffer (marker-buffer mk))
+
+    (with-current-buffer (marker-buffer mk)
+      (unless (eq (goto-char mk) (point))
+        ;; If narrowing gets in the way of going to the right place, widen.
+        (widen)
+        (if next-error-move-function
+            (funcall next-error-move-function msg mk)
+          (goto-char mk)))
+      (if end-mk
+          (push-mark end-mk t)
+        (if mark-active (setq mark-active)))
+      ;; If hideshow got in the way of
+      ;; seeing the right place, open permanently.
+      (dolist (ov (overlays-at (point)))
+        (when (eq 'hs (overlay-get ov 'invisible))
+          (delete-overlay ov)
+          (goto-char mk))))))</code></pre>
+<p>And as a complement to that, rust-mode tries to get fancy with jumping to compile errors. Undo that too.</p>
+<pre><code>  (eval-after-load 'compile
+    (remove-hook 'next-error-hook 'rustc-scroll-down-after-next-error)))</code></pre>
+<p>There’s probably more interactions I’ll discover with various packages, but on the whole this has been working for me quite well.</p>
+
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

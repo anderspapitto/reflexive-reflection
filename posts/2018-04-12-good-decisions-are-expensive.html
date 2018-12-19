@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - Good decisions are expensive</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="../index.html">Home</a>
+            <a href="../posts.html">All Posts</a>
+            <a href="../contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="../tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>Good decisions are expensive</h1>
+<div class="soft">
+    A look at how the difficulty and cost of making decisions is often underestimated, with example.<br />
+    April 12, 2018 (<a href="../tags/decisions.html">decisions</a>)
+</div>
+
+<p>I think a lot of discourse tends to be off the mark because the immense difficulty of making good, high-quality decisions isn’t appreciated.</p>
+<p>My favorite example for this is borrowed from Kahneman’s book Thinking Fast and Slow. He introduced it to make a different point, but what I got out of it is that even in some of the simplest circumstances, being correct is so difficult and tricky that it’s unreasonable to expect it from anyone.</p>
+<p>This scenario is this. There’s an military instructor, teaching students to fly airplanes. As part of the training, he goes up with the students on test flights. Sometimes they do well, sometimes they do poorly, and he gives them praise or criticism appropriately.</p>
+<p>So far, so good. Now, after a while, being very careful and observant, he starts to notice a pattern.</p>
+<p>Whenever he gives praise, the students do worse afterwards. And whenever he criticizes them, they improve. And this pattern just won’t go away, even after he starts writing it all down at tracking it.</p>
+<p>So, in the end, after a lot of thought, he reaches the only reasonable conclusion: praise hurts the students performance, and criticism helps it. So the correct thing to do is to stop praising students, and ramp up the criticism.</p>
+<p>The only problem is that this is 100% completely dead wrong. If you haven’t heard this one before, I encourage you to try to do better and figure out why.</p>
+<p>Before we get into the answer, let’s unpack the situation.</p>
+<ul>
+<li>this instructor is a well-qualified expert in his field</li>
+<li>this is really important to him</li>
+<li>it’s actually a very simple scenario</li>
+<li>he’s super careful</li>
+<li>he’s thinking as hard as he can</li>
+<li>his observations are correct. students really do get worse after praise, and better after criticism. He’s just wrong about why.</li>
+</ul>
+<p>On the whole, I don’t fault this instructor in the slightest for getting this one wrong. He’s not dumb or lazy or uninterested or biased or trying something too ambitious. Making correct decisions is just Really Hard.</p>
+<p>So, here’s what’s really going on - <a href="https://en.wikipedia.org/wiki/Regression_toward_the_mean">regression to the mean</a>. Basically, how well a student flies on any particular day is a combination of skill and luck (maybe 30/70, 50/50, 95/5 - doesn’t matter for our purposes).</p>
+<p>When the instructor gives out praise, it’s after really good performances. The best performances will be, for the most part, lucky. And likewise criticism will be given after performances that are more unlucky than usual.</p>
+<p>The key characteristic of luck though, is that it doesn’t stick around. The next day, when the student goes up in the air again, they’ll have the same skill as before, but on average they’ll have average luck. If they were lucky the day before (and got praised for it), they’ll do worse, because average luck is worse than good luck. If they were unlucky the day before (and got criticized for it), they’ll do better, because average luck is better than bad luck.</p>
+<p>There’s more to say on it, but that’s the overview and there’s no point in me parroting the whole wikipedia article. (Interesting tidbit though - this is also how placebos “work” in medicine).</p>
+<p>For our purposes, the important thing here is that it’s not the instructors fault that he doesn’t know about this obscure statistical trap. So unless and until we live in a world where people consult their local statisticians before daring to say “good job out there today”, we have to recognize that decisions are difficult.</p>
+
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

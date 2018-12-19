@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - All posts</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/rss.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Tue, 18 Dec 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Wireguard vpn with network namespace on NixOS</title>
+    <link>https://reflexivereflection.com/posts/2018-12-18-wireguard-vpn-with-network-namespace-on-nixos.html</link>
+    <description><![CDATA[<h1 id="background">Background</h1>
+<p><a href="https://www.wireguard.com/">Wireguard</a> is a shiny new VPN option. Interestingly, they <a href="https://www.wireguard.com/netns/">recommend</a> using network namespaces to set up routing.</p>
+<p>Roughly speaking, the traditional model is to have encrypted tunnel and the hardware interfaces visible to programs at the same time, and setting up routing rules to make sure everything goes into the tunnel.</p>
+<p>The newer approach is to hide away the physical interfaces in a namespace that’s invisible to most programs, and only expose the wireguard tunnel by default. Only programs that explicitly deal with the physical interfaces, like dhcpcd, even need to know they exist. Conceptually, this is simpler than complicated routing rules, but implementing it has some practical hurdles, since existing programs and configurations may need tweaking to work with the network namespace.</p>
+<p><a href="https://nixos.org/">NixOS</a> is an awesome and pioneering linux distribution.</p>
+<p>Here’s how I’ve gotten a fully-functional, somehwat-rough-around-the-edges wireguard client setup on my NixOS laptop.</p>
+<p>Code is on <a href="https://github.com/anderspapitto/nixos-configuration/blob/master/wireguard-client.nix">github</a>.</p>
+<h1 id="description">Description</h1>
+<p>Fist off, we have a systemd service which creates a network namespace, with a hardcoded name <code>physical</code>. It’s not necessary to break this out, but I’d like to keep the namespace around even when I shut down the wireguard tunnel, just in case I’d like to keep anything active inside it (in particular, i3status continually keeps tabs on the physical interfaces).</p>
+<pre><code>systemd.services = {
+  physical-netns = {
+    description = &quot;physical namespace, for use with wireguard&quot;;
+    wantedBy = [ &quot;default.target&quot; ];
+    before = [ &quot;display-manager.service&quot; &quot;network.target&quot; ];
+    serviceConfig = {
+      Type = &quot;oneshot&quot;;
+      RemainAfterExit = true;
+      ExecStart = &quot;${pkgs.iproute}/bin/ip netns add physical&quot;;
+      ExecStop = &quot;${pkgs.iproute}/bin/ip netns del physical&quot;;
+    };
+  };
+};</code></pre>
+<p>Then we have a service that actually brings up and down the tunnel, and redirects traffic through it. This is heavily based on the wireguard tutorial, though it’s not exactly the same. It depends on the namespace existing (reflected in the systemd <code>requires</code> and <code>after</code> clauses).</p>
+<pre><code>systemd.services = {
+  wg0 = {
+    description = &quot;Wireguard interface, and vpn&quot;;
+    requires = [ &quot;physical-netns.service&quot; ];
+    after = [ &quot;physical-netns.service&quot; ];
+    serviceConfig = {
+      Type = &quot;oneshot&quot;;
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeScript &quot;wgup&quot; &#39;&#39;
+        #! ${pkgs.bash}/bin/bash
+        ${pkgs.iproute}/bin/ip -n physical link add wgvpn0 type wireguard
+        ${pkgs.iproute}/bin/ip -n physical link set wgvpn0 netns 1
+        ${pkgs.wireguard}/bin/wg set wgvpn0 \
+          private-key /root/wireguard-keys/private \
+          peer ghK62ZFGd9zkRPfF6JehK7OMAW6HMdy68RNalq9FVUo= \
+          allowed-ips 0.0.0.0/0 \
+          endpoint thufir:51820
+        ${pkgs.iproute}/bin/ip link set wgvpn0 up
+        ${pkgs.iproute}/bin/ip addr add 10.100.0.2/24 dev wgvpn0
+        ${pkgs.iproute}/bin/ip route add default dev wgvpn0
+        ${pkgs.iproute}/bin/ip link set enp0s25 netns physical
+        ${pkgs.iw}/bin/iw phy phy0 set netns name physical
+        ${pkgs.systemd}/bin/systemctl restart --no-block wpa_supplicant dhcpcd
+      &#39;&#39;;
+      ExecStop =  pkgs.writeScript &quot;wgdown&quot; &#39;&#39;
+        #! ${pkgs.bash}/bin/bash
+        ${pkgs.iproute}/bin/ip -n physical link set enp0s25 netns 1
+        ${pkgs.iproute}/bin/ip netns exec physical ${pkgs.iw}/bin/iw phy phy0 set netns 1
+        ${pkgs.iproute}/bin/ip link del wgvpn0
+        ${pkgs.systemd}/bin/systemctl restart --no-block wpa_supplicant dhcpcd
+      &#39;&#39;;
+    };
+  };
+};
+</code></pre>
+<p>Then we have a small helper <code>physexec</code>, analogous to the shell script described on the wireguard page.</p>
+<pre><code>physexec = pkgs.writeScriptBin &quot;physexec&quot; &#39;&#39;
+    #! ${pkgs.bash}/bin/bash
+    exec sudo -E ${pkgs.iproute}/bin/ip netns exec physical \
+         sudo -E -u \#$(${pkgs.coreutils}/bin/id -u) \
+                 -g \#$(${pkgs.coreutils}/bin/id -g) \
+                 &quot;$@&quot;
+  &#39;&#39;;</code></pre>
+<p>Now we come to the ugliest part of the whole thing. <code>dhcpcd</code> and <code>wpa_supplicant</code> need to be inside the netns when I have the vpn on, and outside of it when the vpn is off. To handle this, we start with a small wrapper <code>phys-aware</code>. Unlike <code>physexec</code>, this wraps a program in the netns only if the wireguard tunnel exists. We’ll use it to wrap the <code>ExecStart</code> of the two systemd services.</p>
+<pre><code>phys-aware = pkgs.writeScript &quot;phys-aware&quot; &#39;&#39;
+    #! ${pkgs.bash}/bin/bash
+    if ${pkgs.iproute}/bin/ip link | ${pkgs.gnugrep}/bin/grep -q wgvpn0;
+    then exec ${pkgs.iproute}/bin/ip netns exec physical &quot;$@&quot;
+    else exec &quot;$@&quot;
+    fi
+  &#39;&#39;;</code></pre>
+<p>Unfortunately, there isn’t a great way to incorporate this into the two services. They’re defined in nixpkgs, they aren’t natively flexible enough for our needs, and there is no tooling that does for modules what overlays do for packages. The least-bad approach is to copy-paste the module definitions into my configuration repo, make my changes, and disable the originals.</p>
+<pre><code>imports = [
+  ./copied/dhcpcd.nix
+  ./copied/wpa_supplicant.nix
+];
+disabledModules = [
+  &quot;services/networking/dhcpcd.nix&quot;
+  &quot;services/networking/wpa_supplicant.nix&quot;
+];</code></pre>
+<p>Even when running inside the netns, I had some issues with the two services not quite knowing which interfaces to work with. Therefore I set this list explicitly, and further tweaked the <code>ExecStart</code> of the two services to explicitly pass this through.</p>
+<pre><code>networking.wireless.interfaces = [ &quot;wlp4s0&quot; ];</code></pre>
+<p>Note from earlier that in our main service, both the <code>ExecStart</code> and <code>ExecStop</code> conclude with a line that restarts these two services. They only switch in or out of the namespace when they are restarted, so we have to do that explicitly.</p>
+<pre><code>${pkgs.systemd}/bin/systemctl restart --no-block wpa_supplicant dhcpcd</code></pre>
+<p>Finally, a bit of a detour. <code>i3status</code>, the status bar of my window manager, displays information about the current wireless connection. However it doesn’t know how to deal with namespaces, so some extra work is necessary. I make a custom i3status script, which internally launches two variants of the original, one inside the netns and one outside. Then there’s some string munging to combine them back together.</p>
+<pre><code>anders-i3status = pkgs.writeScriptBin &quot;anders-i3status&quot; &#39;&#39;
+    #! ${pkgs.python3}/bin/python -u
+    import os
+    import signal
+    import subprocess
+    # https://stackoverflow.com/questions/320232/ensuring-subprocesses-are-dead-on-exiting-python-program
+    os.setpgrp() # create new process group, become its leader
+    try:
+      p1 = subprocess.Popen([&#39;physexec&#39;, &#39;i3status&#39;, &#39;-c&#39;, &#39;/etc/i3/status-netns&#39;],
+                            stdout=subprocess.PIPE)
+      p2 = subprocess.Popen([            &#39;i3status&#39;, &#39;-c&#39;, &#39;/etc/i3/status&#39;],
+                            stdout=subprocess.PIPE)
+      for i in range(2):
+        line1 = p1.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        line2 = p2.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        print(line1)
+      while True:
+        line1 = p1.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        line2 = p2.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        print(line1.split(&#39;]&#39;)[0] + &#39;, &#39; + line2.split(&#39;[&#39;)[1])
+    finally:
+      os.killpg(0, signal.SIGKILL) # kill all processes in my group
+  &#39;&#39;;</code></pre>
+<h1 id="thoughts">Thoughts</h1>
+<p>Overall I’m pretty satisfied. By far my biggest wishlist item to come out of this would be a cleaner way to wrap existing services. It’s not reasonable to have a flag on every service for whether or not to wrap it in a user namespace, and so there should be a way to apply this type of mechanical change to a service even when it’s not explicitly provided for. A related (rejected) feature request at the systemd level is <a href="https://github.com/systemd/systemd/issues/2741">here</a>.</p>]]></description>
+    <pubDate>Tue, 18 Dec 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-12-18-wireguard-vpn-with-network-namespace-on-nixos.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Wrap-up and Further Topics</title>
+    <link>https://reflexivereflection.com/posts/2018-08-25-further-topics.html</link>
+    <description><![CDATA[<p>That about covers the very core idea. Building an entire city and providing it as a service can be approached as a viable business.</p>
+<p>There are many many further things to address (and I intend to) but they all build on that core. These further topics mostly fall into these broad categories:</p>
+<ul>
+<li>Practical details of building and maintaining Pseudopolis, in terms of both the physical city and its people.</li>
+<li>Elaboration on the social and economic factors that make the environment ripe for Pseudopolis.</li>
+<li>Discussion of how to adapt Pseudopolis to be not only profitable but also a public good, the first city in the world which guarantees accessibility to all people.</li>
+</ul>
+<p>Thanks for reading! If you’ve made it this far, please do message me to let me know what you found interesting and any thoughts you’ve had in response.</p>]]></description>
+    <pubDate>Sat, 25 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-25-further-topics.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Competitive Advantages - Recruiting</title>
+    <link>https://reflexivereflection.com/posts/2018-08-24-competitive-advantages-recruiting.html</link>
+    <description><![CDATA[<p>The key hurdle to overcome is that a city needs to recruit inhabitants and businesses. There are strong network effects, which make bootstrapping in competition with existing cities difficult. It will largely be a game of financially incentivizing early adopters, either directly or indirectly. However there are also some key advantages that are important to note.</p>
+<p>The first advantage is that recruiting is simply more straightforward for Pseudopolis. If a traditional city wants to attract any particular people or businesses, it has to be done indirectly - for example, figuring out how to provide a set of tax breaks that entices some relevant industry. They’re also constrained with what usages of public money will be accepted by voters. In contrast, Pseudopolis Corp can just directly provide free offices, or even straight-up cash. And since it’s Pseudopolis Corp’s money, there’s no need or reason to answer to voters over how it’s spent. Another example would be offering free houses specifically to desirable individuals with good careers and income - something that would never fly in a traditional city. This flexibility is a huge advantage.</p>
+<p>The second advantage is that Pseudopolis Corp is better able to capture the value generated from recruiting and growing the city. This is analogous to the point with infrastructure projects. If a company moves in and starts attracting workers, that value won’t be soaked up by whoever happens to own property nearby - it will be soaked up by Pseudopolis Corp, because Pseudopolis Corp <em>is</em> the landowner. That means that not only does Pseudopolis Corp have the practical means to outbid traditional cities, it also has more reason to because the equivalent investment will return more money.</p>
+<p>A third advantage is that Pseudopolis Corp can bootstrap by itself being a major employer in the early days. In the long term network effects and third parties will dominate the economy, but in the short term, a huge part of what’s going on will be building the city itself - and the people doing it may as well be the first people to live there.</p>
+<p>A fourth, one-time advantage is in choosing a location. Cities can’t move, so this is impossible to retrofit into any existing city. When choosing a location, there is an opportunity to seek some particular advantages - for example, a particular climate or a low-tax jurisdiction.</p>]]></description>
+    <pubDate>Fri, 24 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-24-competitive-advantages-recruiting.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Competitive Advantages - Building</title>
+    <link>https://reflexivereflection.com/posts/2018-08-23-competitive-advantages-building.html</link>
+    <description><![CDATA[<p>a.k.a why will this work?</p>
+<p>Traditional cities are organic entities with varied and conflicting priorities. In contrast, Pseudopolis is a single-purpose, purpose-built solution meant to provide urban space with the greatest efficiency.</p>
+<p>Also, in traditional cities the value of improving the city is split and contested between many different groups - all the various landowners, the local government, and so on. In contrast, in Pseudopolis all the value is funneled through the sole landowner, Pseudopolis Corp. That means that many investments would pay off in Pseudopolis which would not in a traditional city.</p>
+<p>This will all come into play for the two main tasks, building and recruiting. First off, let’s look at two examples of how Pseudopolis will be able to build more effectively than traditional cities.</p>
+<h2 id="example---building-a-new-subway-line">Example - Building a new subway line</h2>
+<p>Consider building a new subway line. In general, it will have a large upfront cost, diffuse and hard-to-predict benefits for many people, and some negative externalities, like increased noise for the nearest houses. A traditional city faces some significant issues here that are avoided by Pseudopolis.</p>
+<ol type="1">
+<li></li>
+</ol>
+<p>A traditional city is only able to capture a fraction of the added value to use to fund the project, by eventually collecting increased property taxes. If the value recaptured by property taxes represents (for example) twenty percent of the total value added, that means that the city can only afford to fund projects that give a five-for-one return, and even those just barely. The rest of the value dissipates to existing landowners.</p>
+<p>In contrast, in Pseudopolis, Pseudopolis Corp <em>is</em> the existing landowners, and can directly capture up to the full added value directly by charging rent. That means that Pseudopolis will always have more options for improving infrastructure, and they will be more cost-efficient.</p>
+<ol start="2" type="1">
+<li></li>
+</ol>
+<p>In a traditional city not only are the benefits of infrastructural improvements diffuse and hard to capture, but the negative externalities are concentrated and incite intense opposition. The owner of the house that will be bulldozed to make way for the new subway line, or even of the house that will merely be subject to round-the-clock noise, suffers large and uncompensated damage. In general, these negative effects, for the affected parties, heavily outweigh their share of the diffuse benefits. This leads to a huge degree of “not in my backyard” opposition to any substantial project, and for good reason.</p>
+<p>In Pseudopolis, again, Pseudopolis Corp <em>is</em> the landowners. Rather than random members of the community suffering ruinous losses which they will rightfully and strenuously object to, the city corporation itself bears the full costs. Since the city corporation also stands to reap the benefits, it will be willing to bear those costs when it makes sense.</p>
+<h2 id="example---building-an-apartment-complex">Example - Building an apartment complex</h2>
+<p>Consider another case, building an apartment complex. It has a different calculus than a public infrastructure project like a subway, but likewise poses problems for traditional cities. In particular, the benefits of building a new apartment complex accrue almost entirely to the property owner. The city as a public entity bears the costs of increased strain on public utilities, and other landowners suffer from lower property values (due to competition). The best situation for any particular landowner is for them to be allowed to build freely, while all others are restricted from doing so.</p>
+<p>Again, in Pseudopolis there is no conflict of interest between the landowner building the new apartment complex and the other landowners - because they are both Pseudopolis Corp. As long as the benefit from leasing out a building full of new apartments offsets the price-lowering effect of increased supply, it will be built.</p>]]></description>
+    <pubDate>Thu, 23 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-23-competitive-advantages-building.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Challenges</title>
+    <link>https://reflexivereflection.com/posts/2018-08-22-challenges.html</link>
+    <description><![CDATA[<p>The biggest challenge, by far, is bootstrapping the city. It’s a big deal to get lots of people to uproot and move, and it’s a bigger deal if you want them to be the first to move to the middle of nowhere.</p>
+<p>Although daunting, that challenge is at least clear-cut. There are also a couple of aspects that are not yet completely clear.</p>
+<p>The first is that while the basic model is that Pseudopolis Corp retains all property rights, in certain circumstances there may be a need for more complexity. For example, a manufacturing business may want to invest heavily into a special-purpose factory. In the rare case that the need arises to repurpose that land, how will that be resolved?</p>
+<p>The second is regulatory. By adopting such an unusual mode of operation, Pseudopolis Corp could potentially become targeted by local government in a way that interferes with its operations.</p>
+<p>However these concerns can likely be figured out, and they are by far secondary to getting Pseudopolis running in the first place.</p>]]></description>
+    <pubDate>Wed, 22 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-22-challenges.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Organization</title>
+    <link>https://reflexivereflection.com/posts/2018-08-21-organization.html</link>
+    <description><![CDATA[<p>The basic arrangement of Pseudopolis is that Pseudopolis corp purchases a big plot of land up front, builds buildings and transit and so forth on it, and then rents out space to any and all people and businesses. Note in particular that Pseudopolis Corp never sells the land, only leases it out.</p>
+<p>To a certain extent, basic services like utilities and transit can be centrally planned and managed by Pseudopolis Corp, as an integral component of the overall offering.</p>]]></description>
+    <pubDate>Tue, 21 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-21-organization.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Revenue Potential</title>
+    <link>https://reflexivereflection.com/posts/2018-08-20-revenue-potential.html</link>
+    <description><![CDATA[<p>How big of an opportunity are we looking at?</p>
+<p>Let’s say that a major US city could draw in revenue based primarily on rent, but also for related services like transit and commercial space, averaging $1000 per month per person for a population of 10 million.</p>
+<p>The ballpark number is then $100 billion per year. There are (obviously) less successful scenarios, but also some which are even more successful.</p>
+<p>Note that most of the costs involved are upfront construction costs, and also that large cities can run indefinitely. In the long run, quite a large fraction of that amount will be profit.</p>]]></description>
+    <pubDate>Mon, 20 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-20-revenue-potential.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Welcome to Pseudopolis</title>
+    <link>https://reflexivereflection.com/posts/2018-08-19-welcome-to-pseudopolis.html</link>
+    <description><![CDATA[<p>I have, effectively, a business idea. There are social motivations and interpretations, which I intend to write about down the line. However the clearest way to make my point is to start with “here is a plan to make money.”</p>
+<p>Here is a plan to make money.</p>
+<p>Cities are incredibly valuable. Traditionally, they are organic entities benefitting from massive network effects, but also invariably suffering from massive scalability problems.</p>
+<p>Therefore I propose to construct a city which is immune to those scaling issues, to rapidly bootstrap it to the point where those network effects kick in, and then provide that city as a service, capable of outcompeting every other city on the planet for the world’s rent monies.</p>
+<p>The working name for the city is Pseudopolis<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, and that for the business entity that builds, maintains, and fully owns it is Pseudopolis Corp.</p>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The name Pseudopolis is borrowed from a fictional off-screen city in Terry Pratchett’s Discworld.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</section>]]></description>
+    <pubDate>Sun, 19 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-19-welcome-to-pseudopolis.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Heuristics</title>
+    <link>https://reflexivereflection.com/posts/2018-04-15-heuristics.html</link>
+    <description><![CDATA[<p>I’ve written before that <a href="https://reflexivereflection.com/posts/2018-04-12-good-decisions-are-expensive.hmtl">making decisions is really hard</a>. I want to dig into that a little more by introducing some useful terminology that I encounter frequently in programming contexts, but quite rarely in any other.</p>
+<p>So - ‘heuristic’.</p>
+<p>A heuristic is a decision-making tool. It’s a way to answer hard questions by finding a similar question that’s easier, and answering that one instead.</p>
+<p>Heuristics don’t give you the right answers (there’s another word, ‘oracle’, for things that magically give correct answers). They can be wrong sometimes, or often, or always. They can be wrong predictably and systemically, or totally at random. They might overestimate or they might underestimate. They may work today and not tomorrow.</p>
+<p>And they’re also absolutely everywhere. They’re in our courts, they’re in our governments. They’re in our societal norms and generational wisdom and also in our prejudices and our relationships and in our streetlights.</p>
+<p>So why would anyone use a tool that gives all sorts of wrong answers? Well, because the answers aren’t entirely useless - they’re close, or they’re sometimes or often or usually right. And they are ((much) much) easier and faster and cheaper to figure out, and that matters a lot.</p>
+<h2 id="examples">Examples</h2>
+<p>So let’s look at some examples.</p>
+<p>Example 1 - when you see someone that you haven’t seen for a couple years, a heuristic that you can use to predict whether you’ll get along with them is to ask if you got along with them the last time you saw them.</p>
+<p>It’s clearly not perfect. They may have changed, for better or for worse. You may have changed. Etc, etc. So if you use this heuristic you might be wrong. But it’s probably going to bear some resemblance to the truth, and it’s dead easy, takes all of half a second. What’s the alternative, if you wanted to be more accurate? Well, you could call up all of your mutual acquantainces, and ask about this person. You could look them up on some social networks, and so on. That would give you a much better sense of whether anything’s changed. But it’s a hell of a lot more work.</p>
+<p>Example 2 - using popular tools. “I use git because other people use git.” “I drive such-and-such a car because so do other people in such-and-such situation”.</p>
+<p>These can definitely be part network effect, but even setting that aside, there’s still a solid reason to use the same stuff as everyone else - you get to piggyback on everyone else’s hard decision-work of figuring out what’s worth using. The wisdom of the crowds is definitely not perfect, and you might make some really bad choices and miss out on some really great less-popular tools if you choose to go with it - but boy is it less work than doing exhaustive research on the construction industry every time you go to pick up a hammer.</p>
+<p>Example 3 - the criminal justice system</p>
+<p>A criminal justice system is a heuristic attempt to assign criminals to prison and non-criminals to freedom. It messes up in both directions - innocent people locked up, guilty people walking free (though it’s interesting to note that the phrase “beyond a reasonable doubt” in the US implies it’s intended to be a conservative heuristic - one that is guaranteed to not make mistakes in the “worse” direction).</p>
+<p>What would a replacement look like that isn’t a heuristic, that is always correct? Well, given that saying a particular thing in a locked room with a certain intent in your mind can be the difference between is-a-crime and is-not-a-crime, it would have to involve constant video and audio and mind-reading surviellance of every single human. Without getting into the moral aspects, if you tried to translate that into a 2018 dollar cost it’s clearly impossible - and so instead we’re stuck with heuristics.</p>
+<p>Example 4 - xenophobia</p>
+<p>Now we’re entering some dangerous territory, so let’s just touch this briefly. But I think it’s important to realize that some of the least-pleasant heuristics that people use are also serving some purpose to some people. In this case, all it takes is to realize “hey, people I grew up with are less likely to shoot me than people I didn’t grow up with.” And again - not always accurate, but it sometimes gives you something that approximates truth. And “have I known this face for my whole life” goes through the human brain a lot faster than running criminal background checks on everyone you shake hands with.</p>
+<h2 id="other-thoughts">Other thoughts</h2>
+<p>People are constantly noticing that importance decisions are made heuristically. There’s often a reaction along the lines of “this is so broken! doesn’t anyone realize that the decisions are completely wrong in such-and-such a case, or under such-and-such circumstances?”</p>
+<p>Well, yes. But it’s not always enough to recognize that people are employing heuristics. It’s not even always enough to recognize that people are employing heuristics, to characterize the ways in which those heuristics break down, and to propose an alternative which is significantly more accurate.</p>
+<p>You probably also have to find a way to make your alternative as easy and cheap and fast and convenient as whatever you’re trying to replace, because making decisions is Real Work and you can’t handwave it away.</p>
+<p>(and then there’s some extra problems tacked on, like overcoming entrenched network effects or other types of initial-resource imbalances - but let’s not get into that now.)</p>]]></description>
+    <pubDate>Sun, 15 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-15-heuristics.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>True Names by hashing genomes</title>
+    <link>https://reflexivereflection.com/posts/2018-04-14-true-names-by-hashing-genomes.html</link>
+    <description><![CDATA[<h1 id="true-names">True Names</h1>
+<p>True names have always been a fascinating concept. Crack open a few of your favorite mythology texts or religious books or fantasy novels and you won’t get far before some person or spirit is being bound into service after letting their true name slip (I recommend <code>The Amulet of Samarkand</code> for an excellent treatment).</p>
+<p>In the real world though, they’ve been an eternal pipe dream. Suppose your long-lost uncle comes back from his travels overseas and tells you on his deathbed “I’ve met this fantastic individual who will lead you to salvation/give you a bunch of money/whatever. Go seek him out, his name is Bob.” Well that’s great, but how are you ever going to single out the one true Bob from all the pretenders? This has always been an unsolvable problem.</p>
+<p>In today’s world, you might have some extra tools. You might have a photo to go off of, you might have a full name and an address and a social security number and the birthdate of the childhood dog.</p>
+<p>But these can all break down one way or another. What if they’re a political refugee (a real risk of doing business when your business is handing out salvations and fortunes) and don’t have a government ID? What if they’re a spy and the government ID is fake, and by the way the NSA knows not only the dog’s birthdate but also its favorite toy?</p>
+<p>So you can muddle by with this stuff, but it’s reasonable to ask for something better.</p>
+<h1 id="existing-solutions">Existing Solutions</h1>
+<p>Let’s briefly review what’s out there, and what kind of problems they have.</p>
+<h2 id="national-id-systems">National ID systems</h2>
+<p>The best of these can be pretty good, but they have some downsides.</p>
+<p>By far the biggest is that they rely on national governments to set up and manage them, and for that reason they only cover a fraction of the world’s population. For example, the US has no such system. We can design something that doesn’t rely on a centralized authority and is accessible to everyone.</p>
+<h2 id="gpg-and-other-cryptography-schemes">GPG and other cryptography schemes</h2>
+<p>These also work pretty well for some things. They break down somewhat at the point where they tie back to real humans though. They can be freely created, so there is no guarantee that each one corresponds to a unique person. If they are accidentally destroyed there is no recovery possible, and if they are stolen there is no way to regain control. If we can design a better system for providing True Names to people, this stuff can still be incredibly useful when layered on top of the True Names.</p>
+<h2 id="social-security-id">Social Security ID</h2>
+<p>In the US, SSIDs often get shoehorned into this role. However for this purpose they’re terrible and insecure for lots of well-known reasons that I won’t rehash here.</p>
+<h1 id="the-plan">The Plan</h1>
+<p>Here’s how True Names work: take a single, globally known cryptographic hash function, along with a single, globally known set of initializing parameters. Your True Name is the result of that hash applied to your full genome.</p>
+<p>Done.</p>
+<h1 id="the-rest-of-the-plan">The Rest of the Plan</h1>
+<p>Ok, actually yes there is more. But that is the core idea, and it has some powerful properties. Let’s introduce some terminology so that we can examine them.</p>
+<p>An Individual is a human who has an identity. Generally what an Individual wants out of the system is to be able to own their own identity - that is, to be able to prove who they are, and to prevent anyone else from claiming to be them.</p>
+<p>An Entity is some human or organization (e.g. your neighbor, your employer, Walmart, France) that wants to interact with Individuals, and wants to be able to know and verify their identities (and we’ll actually generalize this a bit later on).</p>
+<p>A Verifier is something that we’ll introduce in a bit.</p>
+<p>So, the basic scenario to solve is: an Individual and an Entity want to interact, and the Entity wants to know that the Individual is really who they are claiming to be. For example, maybe the Individual wants to purchase something from the Entity’s online store, and the Entity wants to make sure it’s not fraud.</p>
+<h2 id="naive-verification">Naive Verification</h2>
+<p>There’s a straightforward implementation. This is NOT what I’m proposing, but let’s consider it as a stepping stone.</p>
+<p>The straightforward, bad implementation is that when an Individual wants to prove who they are to an Entity, they provide a DNA sample directly to the Entity, who sequences it, hashes it, and confirms that it matches the True Name which the Individual is claiming. This is terrible.</p>
+<ul>
+<li>Every time that an Individual interacts with an Entity, they have to give that Entity not just their True Name, but also their full genome.</li>
+<li>Every verification must be in-person, to verify that the dna sample is from the correct Individual.</li>
+<li>Every verification is slow and expensive, because it requires sequencing the genome.</li>
+</ul>
+<h2 id="intermediated-verification">Intermediated Verification</h2>
+<p>All of these can be adressed by introducing a set of intermediaries, the Verifiers. Rather than Individuals proving themselves directly to Entities, they prove themselves to Verifiers, and the Verifiers give them a signed private key that can in turn be used to demonstrate to Entities that the issuing Verifier has in fact verified that Individual.</p>
+<p>So in a sense, it’s very similar to a government ID program - you prove who you are to a government, they provide you with an ID, and then you use the ID to talk to third parties.</p>
+<p>There are some key differences though. For one thing, government-based IDs require governments that are willing to issue IDs. If the government is non-existent or makes mistakes or is untrustworthy or doesn’t want to assign IDs, then this doesn’t work.</p>
+<p>Because in this scheme the mapping of Individual to True Name is deterministic and therefore doesn’t depend on the Verifier, we don’t need a single privileged Verifier. There can be any number of them, and no matter which one a particular Individual goes to, they will produce the same True Name.</p>
+<p>There is also no necessity to deal with any particular Verifier. With national IDs, Individuals only have one option for who can issue them an identity. And Entities have to deal with whatever the Individual can provide.</p>
+<p>In the True Name system, both Individuals and Entities have complete freedom to decide which Verifiers they trust and are willing to deal with. For any pairing of an Individual and an Entity, as long as there is one Verifier that both of them trust, the Individual can go to that Verifier to obtain a private key that the Entity will trust.</p>
+<h1 id="reclaiming-identities">Reclaiming Identities</h1>
+<p>So, when an Individual goes to a Verifier, they recieve a private key. That private key acts as evidence of being that Individual - but it could be lost or stolen. So what then?</p>
+<p>Well, the Individual simply goes back to the Verifier, says “the key was lost/stolen”, and the Verifier invalidates the previous key and issues a new one. Again similar to a national ID scheme, the Verifier is actually who has control over the identity (this sounds like a downside but we’ll address it later), which means that losses and thefts are reversible.</p>
+<h1 id="arbitrarily-flexible-trust">Arbitrarily Flexible Trust</h1>
+<p>So, the system starts to seem a little weak to bad-acting Verifiers. If they’re actually in control of all they keys, how can you know they won’t start lying about them or impersonating customers or anything?</p>
+<p>The answer has two parts.</p>
+<p>The first part is that since Verifiers all provide the same service, there is a market and competition arises between them, which rewards trustworthiness and pushes out abusive participants.</p>
+<p>The second part is that you can actually combine or split keys. For example, you could pick three Verifiers, one based in the US, one based in China, and one in Switzerland, and you could configure your bank account to be controlled by any two of the three. Then even if one of those goverments forces the Verifier to confiscate your funds, you’re safe unless they also collude against you with the other governments.</p>
+<p>This also has applications for online commerce type interactions. An Entity can choose not only which Verifiers they trust, but which combinations - for example by requiring verification by either</p>
+<ul>
+<li>any reputable local Verifier</li>
+</ul>
+<p>OR</p>
+<ul>
+<li>any Verifier directly run by some national government.</li>
+</ul>
+<h1 id="reclaiming-accounts">Reclaiming Accounts</h1>
+<p>In addition to regaining control over the True Name itself, this setup allows allows a pretty lightweight way to retain control over accounts. For example, consider that you lose control of your gmail account. It’s a huge hassle to recover it, because while in a creepy way Google knows everything about you, in a practical way they also have no idea who you are.</p>
+<p>However, when you sign up for an account, you could additionally provide a True Name, and a list of Verifiers that you trust. Anyone able to prove to one of those Verifiers that they are you would be able to take over the account at any time - and conveniently, only you can prove that you are you.</p>
+<p>As a special case of keys being lost, this also can allow for reasonable treatments of keys belonging to people who die - if you used this as the source of control over your cryptocurrencies, then it’s still technically possible for the Verifiers to pass control on to your children.</p>
+<h1 id="im-not-a-bot">I’m not a bot</h1>
+<p>There are also some interesting services that can be built on top of this. For example, one consequence of True Names is that everyone only has one. But a service could be built that consumes True Names and runs them through arbitrary other hash functions, to produce a greater supply of uncorrelated identities. These could be used by, for example, an online forum that doesn’t care exactly who you are, but that does want to enforce that there is a real, unique human behind every account.</p>
+<h1 id="can-this-really-happen">Can this really happen?</h1>
+<p>The main two obstacles are</p>
+<ul>
+<li><p>cost of dna sequencing, which is on a downward march.</p></li>
+<li><p>competition. For example, if the US goverment decides to roll out a high-quality national ID system, then the practical need for this type of scheme is reduced.</p></li>
+</ul>
+<h1 id="and-more">And more</h1>
+<p>This is a partial treatment. I covered most of the basics, but it’s quite long already so I’ll cut it short.</p>]]></description>
+    <pubDate>Sat, 14 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-14-true-names-by-hashing-genomes.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

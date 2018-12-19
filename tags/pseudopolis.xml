@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged pseudopolis</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/pseudopolis.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Sat, 25 Aug 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Wrap-up and Further Topics</title>
+    <link>https://reflexivereflection.com/posts/2018-08-25-further-topics.html</link>
+    <description><![CDATA[<p>That about covers the very core idea. Building an entire city and providing it as a service can be approached as a viable business.</p>
+<p>There are many many further things to address (and I intend to) but they all build on that core. These further topics mostly fall into these broad categories:</p>
+<ul>
+<li>Practical details of building and maintaining Pseudopolis, in terms of both the physical city and its people.</li>
+<li>Elaboration on the social and economic factors that make the environment ripe for Pseudopolis.</li>
+<li>Discussion of how to adapt Pseudopolis to be not only profitable but also a public good, the first city in the world which guarantees accessibility to all people.</li>
+</ul>
+<p>Thanks for reading! If you’ve made it this far, please do message me to let me know what you found interesting and any thoughts you’ve had in response.</p>]]></description>
+    <pubDate>Sat, 25 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-25-further-topics.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Competitive Advantages - Recruiting</title>
+    <link>https://reflexivereflection.com/posts/2018-08-24-competitive-advantages-recruiting.html</link>
+    <description><![CDATA[<p>The key hurdle to overcome is that a city needs to recruit inhabitants and businesses. There are strong network effects, which make bootstrapping in competition with existing cities difficult. It will largely be a game of financially incentivizing early adopters, either directly or indirectly. However there are also some key advantages that are important to note.</p>
+<p>The first advantage is that recruiting is simply more straightforward for Pseudopolis. If a traditional city wants to attract any particular people or businesses, it has to be done indirectly - for example, figuring out how to provide a set of tax breaks that entices some relevant industry. They’re also constrained with what usages of public money will be accepted by voters. In contrast, Pseudopolis Corp can just directly provide free offices, or even straight-up cash. And since it’s Pseudopolis Corp’s money, there’s no need or reason to answer to voters over how it’s spent. Another example would be offering free houses specifically to desirable individuals with good careers and income - something that would never fly in a traditional city. This flexibility is a huge advantage.</p>
+<p>The second advantage is that Pseudopolis Corp is better able to capture the value generated from recruiting and growing the city. This is analogous to the point with infrastructure projects. If a company moves in and starts attracting workers, that value won’t be soaked up by whoever happens to own property nearby - it will be soaked up by Pseudopolis Corp, because Pseudopolis Corp <em>is</em> the landowner. That means that not only does Pseudopolis Corp have the practical means to outbid traditional cities, it also has more reason to because the equivalent investment will return more money.</p>
+<p>A third advantage is that Pseudopolis Corp can bootstrap by itself being a major employer in the early days. In the long term network effects and third parties will dominate the economy, but in the short term, a huge part of what’s going on will be building the city itself - and the people doing it may as well be the first people to live there.</p>
+<p>A fourth, one-time advantage is in choosing a location. Cities can’t move, so this is impossible to retrofit into any existing city. When choosing a location, there is an opportunity to seek some particular advantages - for example, a particular climate or a low-tax jurisdiction.</p>]]></description>
+    <pubDate>Fri, 24 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-24-competitive-advantages-recruiting.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Competitive Advantages - Building</title>
+    <link>https://reflexivereflection.com/posts/2018-08-23-competitive-advantages-building.html</link>
+    <description><![CDATA[<p>a.k.a why will this work?</p>
+<p>Traditional cities are organic entities with varied and conflicting priorities. In contrast, Pseudopolis is a single-purpose, purpose-built solution meant to provide urban space with the greatest efficiency.</p>
+<p>Also, in traditional cities the value of improving the city is split and contested between many different groups - all the various landowners, the local government, and so on. In contrast, in Pseudopolis all the value is funneled through the sole landowner, Pseudopolis Corp. That means that many investments would pay off in Pseudopolis which would not in a traditional city.</p>
+<p>This will all come into play for the two main tasks, building and recruiting. First off, let’s look at two examples of how Pseudopolis will be able to build more effectively than traditional cities.</p>
+<h2 id="example---building-a-new-subway-line">Example - Building a new subway line</h2>
+<p>Consider building a new subway line. In general, it will have a large upfront cost, diffuse and hard-to-predict benefits for many people, and some negative externalities, like increased noise for the nearest houses. A traditional city faces some significant issues here that are avoided by Pseudopolis.</p>
+<ol type="1">
+<li></li>
+</ol>
+<p>A traditional city is only able to capture a fraction of the added value to use to fund the project, by eventually collecting increased property taxes. If the value recaptured by property taxes represents (for example) twenty percent of the total value added, that means that the city can only afford to fund projects that give a five-for-one return, and even those just barely. The rest of the value dissipates to existing landowners.</p>
+<p>In contrast, in Pseudopolis, Pseudopolis Corp <em>is</em> the existing landowners, and can directly capture up to the full added value directly by charging rent. That means that Pseudopolis will always have more options for improving infrastructure, and they will be more cost-efficient.</p>
+<ol start="2" type="1">
+<li></li>
+</ol>
+<p>In a traditional city not only are the benefits of infrastructural improvements diffuse and hard to capture, but the negative externalities are concentrated and incite intense opposition. The owner of the house that will be bulldozed to make way for the new subway line, or even of the house that will merely be subject to round-the-clock noise, suffers large and uncompensated damage. In general, these negative effects, for the affected parties, heavily outweigh their share of the diffuse benefits. This leads to a huge degree of “not in my backyard” opposition to any substantial project, and for good reason.</p>
+<p>In Pseudopolis, again, Pseudopolis Corp <em>is</em> the landowners. Rather than random members of the community suffering ruinous losses which they will rightfully and strenuously object to, the city corporation itself bears the full costs. Since the city corporation also stands to reap the benefits, it will be willing to bear those costs when it makes sense.</p>
+<h2 id="example---building-an-apartment-complex">Example - Building an apartment complex</h2>
+<p>Consider another case, building an apartment complex. It has a different calculus than a public infrastructure project like a subway, but likewise poses problems for traditional cities. In particular, the benefits of building a new apartment complex accrue almost entirely to the property owner. The city as a public entity bears the costs of increased strain on public utilities, and other landowners suffer from lower property values (due to competition). The best situation for any particular landowner is for them to be allowed to build freely, while all others are restricted from doing so.</p>
+<p>Again, in Pseudopolis there is no conflict of interest between the landowner building the new apartment complex and the other landowners - because they are both Pseudopolis Corp. As long as the benefit from leasing out a building full of new apartments offsets the price-lowering effect of increased supply, it will be built.</p>]]></description>
+    <pubDate>Thu, 23 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-23-competitive-advantages-building.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Challenges</title>
+    <link>https://reflexivereflection.com/posts/2018-08-22-challenges.html</link>
+    <description><![CDATA[<p>The biggest challenge, by far, is bootstrapping the city. It’s a big deal to get lots of people to uproot and move, and it’s a bigger deal if you want them to be the first to move to the middle of nowhere.</p>
+<p>Although daunting, that challenge is at least clear-cut. There are also a couple of aspects that are not yet completely clear.</p>
+<p>The first is that while the basic model is that Pseudopolis Corp retains all property rights, in certain circumstances there may be a need for more complexity. For example, a manufacturing business may want to invest heavily into a special-purpose factory. In the rare case that the need arises to repurpose that land, how will that be resolved?</p>
+<p>The second is regulatory. By adopting such an unusual mode of operation, Pseudopolis Corp could potentially become targeted by local government in a way that interferes with its operations.</p>
+<p>However these concerns can likely be figured out, and they are by far secondary to getting Pseudopolis running in the first place.</p>]]></description>
+    <pubDate>Wed, 22 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-22-challenges.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Organization</title>
+    <link>https://reflexivereflection.com/posts/2018-08-21-organization.html</link>
+    <description><![CDATA[<p>The basic arrangement of Pseudopolis is that Pseudopolis corp purchases a big plot of land up front, builds buildings and transit and so forth on it, and then rents out space to any and all people and businesses. Note in particular that Pseudopolis Corp never sells the land, only leases it out.</p>
+<p>To a certain extent, basic services like utilities and transit can be centrally planned and managed by Pseudopolis Corp, as an integral component of the overall offering.</p>]]></description>
+    <pubDate>Tue, 21 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-21-organization.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Revenue Potential</title>
+    <link>https://reflexivereflection.com/posts/2018-08-20-revenue-potential.html</link>
+    <description><![CDATA[<p>How big of an opportunity are we looking at?</p>
+<p>Let’s say that a major US city could draw in revenue based primarily on rent, but also for related services like transit and commercial space, averaging $1000 per month per person for a population of 10 million.</p>
+<p>The ballpark number is then $100 billion per year. There are (obviously) less successful scenarios, but also some which are even more successful.</p>
+<p>Note that most of the costs involved are upfront construction costs, and also that large cities can run indefinitely. In the long run, quite a large fraction of that amount will be profit.</p>]]></description>
+    <pubDate>Mon, 20 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-20-revenue-potential.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Welcome to Pseudopolis</title>
+    <link>https://reflexivereflection.com/posts/2018-08-19-welcome-to-pseudopolis.html</link>
+    <description><![CDATA[<p>I have, effectively, a business idea. There are social motivations and interpretations, which I intend to write about down the line. However the clearest way to make my point is to start with “here is a plan to make money.”</p>
+<p>Here is a plan to make money.</p>
+<p>Cities are incredibly valuable. Traditionally, they are organic entities benefitting from massive network effects, but also invariably suffering from massive scalability problems.</p>
+<p>Therefore I propose to construct a city which is immune to those scaling issues, to rapidly bootstrap it to the point where those network effects kick in, and then provide that city as a service, capable of outcompeting every other city on the planet for the world’s rent monies.</p>
+<p>The working name for the city is Pseudopolis<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>, and that for the business entity that builds, maintains, and fully owns it is Pseudopolis Corp.</p>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>The name Pseudopolis is borrowed from a fictional off-screen city in Terry Pratchett’s Discworld.<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</section>]]></description>
+    <pubDate>Sun, 19 Aug 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-08-19-welcome-to-pseudopolis.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

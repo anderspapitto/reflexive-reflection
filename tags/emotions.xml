@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged emotions</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/emotions.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Tue, 10 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>What is sadness?</title>
+    <link>https://reflexivereflection.com/posts/2018-04-10-what-is-sadness.html</link>
+    <description><![CDATA[<p>Wikipedia says</p>
+<p>“Sadness is an emotional pain associated with, or characterized by, feelings of disadvantage, loss, despair, grief, helplessness, disappointment and sorrow.”</p>
+<p>I think I can do it more concisely.</p>
+<p>Sadness is desire coupled with the understanding that said desire cannot be realized.</p>
+<p>Actually there’s one case that doesn’t fit into this neatly, which is empathic sadness. But I think it covers all cases of being sad on one’s own behalf.</p>]]></description>
+    <pubDate>Tue, 10 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-10-what-is-sadness.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

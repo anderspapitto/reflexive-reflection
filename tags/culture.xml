@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged culture</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/culture.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Mon, 09 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Story debt</title>
+    <link>https://reflexivereflection.com/posts/2018-04-09-story-debt.html</link>
+    <description><![CDATA[<p>Game of thrones has it. Wheel of time had it. Probably for as long as people have been telling stories, stories have been sinking under the accumulated weight of their own built-up baggage.</p>
+<p>There’s a <a href="http://slatestarcodex.com/2014/07/30/meditations-on-moloch/">molochian</a> ruthless-markets explanation for it. When you’re writing a story, you’ll always have the option to trade an up-front shot in the arm - by introducing new characters and perspectives and plot twists - in exchange for headaches down the line, when you have to resolve them all together. Even just the obligation to record what happens on side plotlines can eventually bring a good story to a crawl.</p>
+<p>Since they take so long to write, which stories get popular is always going to be based on how good the first couple books are - which is the part where you see all the benefits and don’t yet have to pay the costs. So, whoever is willing to make this tradeoff to the most extreme degree will have an edge in outcompeting all those authors who restrain themselves upfront in order to have a prayer at successfully concluding.</p>
+<p>So, the end result is that the super popular stories we end up with are exactly those that have a super high chance of getting bogged down.</p>]]></description>
+    <pubDate>Mon, 09 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-09-story-debt.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

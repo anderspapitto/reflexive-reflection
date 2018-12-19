@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged meta</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/meta.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Mon, 08 Jan 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>New Blog</title>
+    <link>https://reflexivereflection.com/posts/2018-01-08-new-blog.html</link>
+    <description><![CDATA[<p>I’m starting a new blog. This is the first post.</p>]]></description>
+    <pubDate>Mon, 08 Jan 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-01-08-new-blog.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

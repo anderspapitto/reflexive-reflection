@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged i3</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/i3.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Tue, 18 Dec 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Wireguard vpn with network namespace on NixOS</title>
+    <link>https://reflexivereflection.com/posts/2018-12-18-wireguard-vpn-with-network-namespace-on-nixos.html</link>
+    <description><![CDATA[<h1 id="background">Background</h1>
+<p><a href="https://www.wireguard.com/">Wireguard</a> is a shiny new VPN option. Interestingly, they <a href="https://www.wireguard.com/netns/">recommend</a> using network namespaces to set up routing.</p>
+<p>Roughly speaking, the traditional model is to have encrypted tunnel and the hardware interfaces visible to programs at the same time, and setting up routing rules to make sure everything goes into the tunnel.</p>
+<p>The newer approach is to hide away the physical interfaces in a namespace that’s invisible to most programs, and only expose the wireguard tunnel by default. Only programs that explicitly deal with the physical interfaces, like dhcpcd, even need to know they exist. Conceptually, this is simpler than complicated routing rules, but implementing it has some practical hurdles, since existing programs and configurations may need tweaking to work with the network namespace.</p>
+<p><a href="https://nixos.org/">NixOS</a> is an awesome and pioneering linux distribution.</p>
+<p>Here’s how I’ve gotten a fully-functional, somehwat-rough-around-the-edges wireguard client setup on my NixOS laptop.</p>
+<p>Code is on <a href="https://github.com/anderspapitto/nixos-configuration/blob/master/wireguard-client.nix">github</a>.</p>
+<h1 id="description">Description</h1>
+<p>Fist off, we have a systemd service which creates a network namespace, with a hardcoded name <code>physical</code>. It’s not necessary to break this out, but I’d like to keep the namespace around even when I shut down the wireguard tunnel, just in case I’d like to keep anything active inside it (in particular, i3status continually keeps tabs on the physical interfaces).</p>
+<pre><code>systemd.services = {
+  physical-netns = {
+    description = &quot;physical namespace, for use with wireguard&quot;;
+    wantedBy = [ &quot;default.target&quot; ];
+    before = [ &quot;display-manager.service&quot; &quot;network.target&quot; ];
+    serviceConfig = {
+      Type = &quot;oneshot&quot;;
+      RemainAfterExit = true;
+      ExecStart = &quot;${pkgs.iproute}/bin/ip netns add physical&quot;;
+      ExecStop = &quot;${pkgs.iproute}/bin/ip netns del physical&quot;;
+    };
+  };
+};</code></pre>
+<p>Then we have a service that actually brings up and down the tunnel, and redirects traffic through it. This is heavily based on the wireguard tutorial, though it’s not exactly the same. It depends on the namespace existing (reflected in the systemd <code>requires</code> and <code>after</code> clauses).</p>
+<pre><code>systemd.services = {
+  wg0 = {
+    description = &quot;Wireguard interface, and vpn&quot;;
+    requires = [ &quot;physical-netns.service&quot; ];
+    after = [ &quot;physical-netns.service&quot; ];
+    serviceConfig = {
+      Type = &quot;oneshot&quot;;
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeScript &quot;wgup&quot; &#39;&#39;
+        #! ${pkgs.bash}/bin/bash
+        ${pkgs.iproute}/bin/ip -n physical link add wgvpn0 type wireguard
+        ${pkgs.iproute}/bin/ip -n physical link set wgvpn0 netns 1
+        ${pkgs.wireguard}/bin/wg set wgvpn0 \
+          private-key /root/wireguard-keys/private \
+          peer ghK62ZFGd9zkRPfF6JehK7OMAW6HMdy68RNalq9FVUo= \
+          allowed-ips 0.0.0.0/0 \
+          endpoint thufir:51820
+        ${pkgs.iproute}/bin/ip link set wgvpn0 up
+        ${pkgs.iproute}/bin/ip addr add 10.100.0.2/24 dev wgvpn0
+        ${pkgs.iproute}/bin/ip route add default dev wgvpn0
+        ${pkgs.iproute}/bin/ip link set enp0s25 netns physical
+        ${pkgs.iw}/bin/iw phy phy0 set netns name physical
+        ${pkgs.systemd}/bin/systemctl restart --no-block wpa_supplicant dhcpcd
+      &#39;&#39;;
+      ExecStop =  pkgs.writeScript &quot;wgdown&quot; &#39;&#39;
+        #! ${pkgs.bash}/bin/bash
+        ${pkgs.iproute}/bin/ip -n physical link set enp0s25 netns 1
+        ${pkgs.iproute}/bin/ip netns exec physical ${pkgs.iw}/bin/iw phy phy0 set netns 1
+        ${pkgs.iproute}/bin/ip link del wgvpn0
+        ${pkgs.systemd}/bin/systemctl restart --no-block wpa_supplicant dhcpcd
+      &#39;&#39;;
+    };
+  };
+};
+</code></pre>
+<p>Then we have a small helper <code>physexec</code>, analogous to the shell script described on the wireguard page.</p>
+<pre><code>physexec = pkgs.writeScriptBin &quot;physexec&quot; &#39;&#39;
+    #! ${pkgs.bash}/bin/bash
+    exec sudo -E ${pkgs.iproute}/bin/ip netns exec physical \
+         sudo -E -u \#$(${pkgs.coreutils}/bin/id -u) \
+                 -g \#$(${pkgs.coreutils}/bin/id -g) \
+                 &quot;$@&quot;
+  &#39;&#39;;</code></pre>
+<p>Now we come to the ugliest part of the whole thing. <code>dhcpcd</code> and <code>wpa_supplicant</code> need to be inside the netns when I have the vpn on, and outside of it when the vpn is off. To handle this, we start with a small wrapper <code>phys-aware</code>. Unlike <code>physexec</code>, this wraps a program in the netns only if the wireguard tunnel exists. We’ll use it to wrap the <code>ExecStart</code> of the two systemd services.</p>
+<pre><code>phys-aware = pkgs.writeScript &quot;phys-aware&quot; &#39;&#39;
+    #! ${pkgs.bash}/bin/bash
+    if ${pkgs.iproute}/bin/ip link | ${pkgs.gnugrep}/bin/grep -q wgvpn0;
+    then exec ${pkgs.iproute}/bin/ip netns exec physical &quot;$@&quot;
+    else exec &quot;$@&quot;
+    fi
+  &#39;&#39;;</code></pre>
+<p>Unfortunately, there isn’t a great way to incorporate this into the two services. They’re defined in nixpkgs, they aren’t natively flexible enough for our needs, and there is no tooling that does for modules what overlays do for packages. The least-bad approach is to copy-paste the module definitions into my configuration repo, make my changes, and disable the originals.</p>
+<pre><code>imports = [
+  ./copied/dhcpcd.nix
+  ./copied/wpa_supplicant.nix
+];
+disabledModules = [
+  &quot;services/networking/dhcpcd.nix&quot;
+  &quot;services/networking/wpa_supplicant.nix&quot;
+];</code></pre>
+<p>Even when running inside the netns, I had some issues with the two services not quite knowing which interfaces to work with. Therefore I set this list explicitly, and further tweaked the <code>ExecStart</code> of the two services to explicitly pass this through.</p>
+<pre><code>networking.wireless.interfaces = [ &quot;wlp4s0&quot; ];</code></pre>
+<p>Note from earlier that in our main service, both the <code>ExecStart</code> and <code>ExecStop</code> conclude with a line that restarts these two services. They only switch in or out of the namespace when they are restarted, so we have to do that explicitly.</p>
+<pre><code>${pkgs.systemd}/bin/systemctl restart --no-block wpa_supplicant dhcpcd</code></pre>
+<p>Finally, a bit of a detour. <code>i3status</code>, the status bar of my window manager, displays information about the current wireless connection. However it doesn’t know how to deal with namespaces, so some extra work is necessary. I make a custom i3status script, which internally launches two variants of the original, one inside the netns and one outside. Then there’s some string munging to combine them back together.</p>
+<pre><code>anders-i3status = pkgs.writeScriptBin &quot;anders-i3status&quot; &#39;&#39;
+    #! ${pkgs.python3}/bin/python -u
+    import os
+    import signal
+    import subprocess
+    # https://stackoverflow.com/questions/320232/ensuring-subprocesses-are-dead-on-exiting-python-program
+    os.setpgrp() # create new process group, become its leader
+    try:
+      p1 = subprocess.Popen([&#39;physexec&#39;, &#39;i3status&#39;, &#39;-c&#39;, &#39;/etc/i3/status-netns&#39;],
+                            stdout=subprocess.PIPE)
+      p2 = subprocess.Popen([            &#39;i3status&#39;, &#39;-c&#39;, &#39;/etc/i3/status&#39;],
+                            stdout=subprocess.PIPE)
+      for i in range(2):
+        line1 = p1.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        line2 = p2.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        print(line1)
+      while True:
+        line1 = p1.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        line2 = p2.stdout.readline().decode(&#39;utf-8&#39;).strip()
+        print(line1.split(&#39;]&#39;)[0] + &#39;, &#39; + line2.split(&#39;[&#39;)[1])
+    finally:
+      os.killpg(0, signal.SIGKILL) # kill all processes in my group
+  &#39;&#39;;</code></pre>
+<h1 id="thoughts">Thoughts</h1>
+<p>Overall I’m pretty satisfied. By far my biggest wishlist item to come out of this would be a cleaner way to wrap existing services. It’s not reasonable to have a flag on every service for whether or not to wrap it in a user namespace, and so there should be a way to apply this type of mechanical change to a service even when it’s not explicitly provided for. A related (rejected) feature request at the systemd level is <a href="https://github.com/systemd/systemd/issues/2741">here</a>.</p>]]></description>
+    <pubDate>Tue, 18 Dec 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-12-18-wireguard-vpn-with-network-namespace-on-nixos.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Disabling emacs window management</title>
+    <link>https://reflexivereflection.com/posts/2018-04-06-disabling-emacs-window-management.html</link>
+    <description><![CDATA[<p>I use Emacs, which is mostly great. However I also use <a href="https://i3wm.org">i3</a>, a tiling window manager, and there’s a little bit of overlap. Emacs can split frames into multiple windows and shuffle things around - but so can i3, and in fact that’s specifically what i3 is built for.</p>
+<p>I resolve this tension pretty heavy-handedly. I use only i3 for placing windows. Emacs is stripped of all power to split frames.</p>
+<p>Here’s how I get emacs to behave (annotated from <a href="https://github.com/anderspapitto/nixos-configuration/blob/master/config/init.el">my init.el</a>.</p>
+<p>The main part is configuring <code>display-buffer-alist</code>, which controls what happens when emacs wants to display a buffer.</p>
+<pre><code>(setq display-buffer-alist
+      &#39;((&quot;shell.*&quot; (display-buffer-same-window) ())
+        (&quot;.*&quot; (display-buffer-reuse-window
+               display-buffer-same-window
+               display-buffer-pop-up-frame)
+         (reusable-frames . t))))</code></pre>
+<p>This tells emacs to always raise an existing window that’s already displaying the buffer, if one exists, and otherwise to display it in the current window. There’s a slight exception for shells - when I switch to them I want them to always display in the current window, even if there’s another frame somewhere already displaying them.</p>
+<p>I override <code>display-buffer-pop-up-window</code>, which is used by some code that really wants to split the window (for example displaying grep results), to instead use the whole thing.</p>
+<pre><code>(defun anders/same-window-instead
+    (orig-fun buffer alist)
+  (display-buffer-same-window buffer nil))
+(advice-add &#39;display-buffer-pop-up-window :around &#39;anders/same-window-instead)</code></pre>
+<p>I’ve forgotten exactly what this does - but I think it tells emacs to switch to the frame that’s already displaying whatever I want to look at, if such a frame exists.</p>
+<pre><code>(defun anders/do-select-frame (orig-fun buffer &amp;rest args)
+  (let* ((old-frame (selected-frame))
+         (window (apply orig-fun buffer args))
+         (frame (window-frame window)))
+    (unless (eq frame old-frame)
+      (select-frame-set-input-focus frame))
+    (select-window window)
+    window))
+(advice-add &#39;display-buffer :around &#39;anders/do-select-frame)</code></pre>
+<p>I make transient frames (I have certain utilities that pop up a temporary frame) go away entirely when they’re done.</p>
+<pre><code>(setq frame-auto-hide-function &#39;delete-frame)</code></pre>
+<p>I completely neuter dedicated window functionality. I don’t need it, since I’m explicitly controlling all window placement anyways, and dedicated windows override a bunch of behavior and break all the other customizations.</p>
+<pre><code>(advice-add &#39;set-window-dedicated-p :around
+            (lambda (orig-fun &amp;rest args) nil))</code></pre>
+<p>There are also some package-specific fixes.</p>
+<p>Org mode</p>
+<pre><code>  (setq org-agenda-window-setup &#39;current-window)</code></pre>
+<p>Gdb</p>
+<pre><code>(setq gdb-display-io-nopopup t)</code></pre>
+<p>Compile. <code>compilation-goto-locus</code> (for jumping to compile errors or grep results) is a huge offender here. It overrides <code>display-buffer-alist</code> with a <code>let</code> binding deep inside it’s internals. There’s nothing for it but to override the whole function with a stripped-down version (still pretty long but look at the original - it’s a real beast).</p>
+<pre><code>  (defun compilation-goto-locus (msg mk end-mk)
+    &quot;Jump to an error corresponding to MSG at MK.
+All arguments are markers.  If END-MK is non-nil, mark is set there
+and overlay is highlighted between MK and END-MK.&quot;
+
+    (display-buffer (marker-buffer msg) &#39;(nil (allow-no-window . t)))
+    (with-current-buffer (marker-buffer msg)
+      (goto-char (marker-position msg))
+      (and w (compilation-set-window w msg)))
+
+    (display-buffer (marker-buffer mk))
+
+    (with-current-buffer (marker-buffer mk)
+      (unless (eq (goto-char mk) (point))
+        ;; If narrowing gets in the way of going to the right place, widen.
+        (widen)
+        (if next-error-move-function
+            (funcall next-error-move-function msg mk)
+          (goto-char mk)))
+      (if end-mk
+          (push-mark end-mk t)
+        (if mark-active (setq mark-active)))
+      ;; If hideshow got in the way of
+      ;; seeing the right place, open permanently.
+      (dolist (ov (overlays-at (point)))
+        (when (eq &#39;hs (overlay-get ov &#39;invisible))
+          (delete-overlay ov)
+          (goto-char mk))))))</code></pre>
+<p>And as a complement to that, rust-mode tries to get fancy with jumping to compile errors. Undo that too.</p>
+<pre><code>  (eval-after-load &#39;compile
+    (remove-hook &#39;next-error-hook &#39;rustc-scroll-down-after-next-error)))</code></pre>
+<p>There’s probably more interactions I’ll discover with various packages, but on the whole this has been working for me quite well.</p>]]></description>
+    <pubDate>Fri, 06 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-06-disabling-emacs-window-management.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

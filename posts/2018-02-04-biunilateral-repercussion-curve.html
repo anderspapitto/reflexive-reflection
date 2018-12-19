@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - Iterated bi-unilateral repercussion curve</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="../index.html">Home</a>
+            <a href="../posts.html">All Posts</a>
+            <a href="../contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="../tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>Iterated bi-unilateral repercussion curve</h1>
+<div class="soft">
+    A smoother model for international diplomacy.<br />
+    February  4, 2018 (<a href="../tags/policy.html">policy</a>)
+</div>
+
+<p>I think I can justify each part of that title :)</p>
+<p>Negotiations/diplomacy between nations is kind of a weird thing. There’s a vast number of things that countries can want out of each other, and the relative importance of each one is all over the charts.</p>
+<p>Here’s some examples (from a country-to-country perspective)</p>
+<ul>
+<li>I want you to not nuke me.</li>
+<li>I want you to not protectionistically subsidize your <X> industry.</li>
+<li>I want my citizens to be safe when they travel to your country.</li>
+<li>I want your citizens to be safe in your country.</li>
+<li>I want to to not release a bunch of CO2.</li>
+<li>I want you to not shoot missiles at that other country.</li>
+<li>I want you to recognize more human rights.</li>
+</ul>
+<p>And for the most part, there’s one big, bulky, overworked hammer that we use to try to solve all of these, namely treaties.</p>
+<p>Treaties are a terrible mechanism for expressing these preferences. Here’s a few big reasons.</p>
+<ul>
+<li>They take a long time to negotiate.</li>
+<li>Because they take so much time and effort to set up, they end up huge and messy and entangled, with unrelated concerns bundled together or traded off against each other.</li>
+<li>As a special case of this, it’s really hard to get a fair handling on the “minor” issues, even if they would have an obvious agreement taken on their own. Once they get bundled in with the big issues, they become an afterthought.</li>
+<li>They’re really hard to fix. You have to sign a whole new treaty, everyone all at once. You can’t tweak small little things, fix the obvious little mistakes that snuck in.</li>
+<li>There’s no getting “close” on a treaty - if any one party isn’t quite happy enough to sign, the whole thing falls apart.</li>
+</ul>
+<p>This can be fixed, though! And fixing it doesn’t even require a Fixing Treaties Treaty to get started, any one or few countries that see the light can get started right away.</p>
+<p>The key is to make everything more flexible, and require much less synchronous coordination.</p>
+<p>The starting point for a treaty is that everyone wants things out of everyone else.</p>
+<p>A wants B to do Thing-ab-1, and they want it Amount-ab-1 A wants B to do Thing-ab-2, and they want it Amount-ab-2 A wants C to do Thing-ac-1, and they want it Amount-ac-1 B wants C to do Thing-bc-1, and they want it Amount-bc-1 B wants C to do Thing-bc-2, and they want it Amount-bc-2 B wants D to do Thing-bd-1, and they want it Amount-bd-1 C wants A to do Thing-ca-1, and they want it Amount-ca-1 C wants B to do Thing-cb-1, and they want it Amount-cb-1 D wants C to do Thing-dc-1, and they want it Amount-dc-1</p>
+<p>The Amounts represent how much the countries want various things, measured in money.</p>
+<p>For example, the USA might really want Mexico to ensure that no US citizens get killed by cartels when visiting, and would set the cost of each transgression at $10 million.</p>
+<p>Or South Korea might want Switzerland to stop harboring cryptocurrency exchanges, but would consider themselves made whole if Switzerland coughed up $5 billion.</p>
+<p>The first step (the “unilateral repercussion curve”) is that each country X keeps track of exactly how badly and in which ways every other country has offended X’s interests, and assigns them a penalty score based on the Amounts. Then they normalize the scores, so that the weighted average of them is zero, and translate them directly into taxes/tariffs/etc that are levied against those countries.</p>
+<p>Let’s look at some nice properties of this approach.</p>
+<ul>
+<li>It’s unilateral. Country X can directly incentivize country Y, through a tariff, to do each thing that country X wants. X doesn’t have to wait to strike the perfect bargain.</li>
+<li>The small stuff gets handled. If country X wants country Y to do something really important (e.g. stop killing political dissidents), and also to do something less important (e.g. preserve some habitat of a vulnerable turtle population), then in the treaty model the turtles are likely to get completely ignored. However in this model, no matter how successful X is in getting Y to stop killing political dissidents, Y is always incentivized to do right by the turtles.</li>
+<li>It’s net-neutral. Each country X will end up penalizing whoever acts against X’s interests the most, and rewarding (by the tariffs going negative) whoever acts most in accordance with X’s wishes. That means that it’s fine to be picky, and ask for a lot of things up front - it’s not going to isolate you from everyone else, because there is a builtin aspect of “treat whoever you like the most as a close friend, even if they still could be better”.</li>
+<li>It’s easy to update, again because it’s unilateral. Penalty for some Thing was too high/low? Just fix it.</li>
+</ul>
+<p>Also notice that this is a generalization of treaties. Instead of France and Spain each agreeing to lower carbon emissions, France can assign a penalty for carbon emissions, Spain can assign a penalty for carbon emissions, and the resulting penalties/tariffs will cancel out. This is the “Bi-” part of “Bi-unilateral”. But at the same time, if France cares more about this than Spain, they’re still free to assign a higher penalty score to each ton of CO2.</p>
+<p>Great, but there’s one key component left.</p>
+<p>Consider that the US doesn’t like a lot of things that North Korea does. So much so, in fact, that the tariffs against NK would be astronomical, and then they start to lose their bite because there would be no trade left to levy further tariffs against.</p>
+<p>So what the US would do, is introduce a new Thing that they want out of every other country. They want each other country to levy an equivalent penalty against NK, or face a (smaller) penalty of their own.</p>
+<p>So, this starts to look like a broad multi-party sanctions against an unpopular nation. Which it is. But it retains all the nice properties from above. Again, this is flexible and interacts cleanly with other more or less important Things that are desired of each other country. Again, there is no need to get everyone in a room to agree in exhaustive detail before taking action - any country can simply declare “starting next month, anyone who follows our lead in applying a penalty against Y corresponding to this Thing will have trade benefits with us, and anyone who doesn’t will have trade penalties”.</p>
+<p>Then, we can add further levels of pressure. After X assigns a Thing to each other nation that does not sanction Y, X can assign a Thing to each other nation, which in turn does not assign an equivalent Thing against each third nation which does not sanction Y. And so on, which allows inter-nation desires to propagate through multiple levels of international relationships, and also justifies the term “iterated”.</p>
+
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

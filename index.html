@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - Home</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="./style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="./index.html">Home</a>
+            <a href="./posts.html">All Posts</a>
+            <a href="./contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="./tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>Reflexive Reflection</h1>
+<p>
+    I am Anders Papitto, and this is Reflexive Reflection, a blog covering
+    anything that I've spent entirely too much time thinking about.
+</p>
+<p>
+    I'm a software engineer and friendly person living in San Francisco. If you find anything here
+    interesting, send me a message!
+</p>
+
+<h1 style="clear: left">Recent Posts</h1>
+<ul>
+    
+    <li>
+        <p>
+            “<a style="font-size: 110%" href="./posts/2018-12-18-wireguard-vpn-with-network-namespace-on-nixos.html">Wireguard vpn with network namespace on NixOS</a>”
+            ‒ <span class="soft">December 18, 2018</span><br />
+            it works pretty well
+        </p>
+    </li>
+    
+    <li>
+        <p>
+            “<a style="font-size: 110%" href="./posts/2018-08-25-further-topics.html">Wrap-up and Further Topics</a>”
+            ‒ <span class="soft">August 25, 2018</span><br />
+            There is a lot to say about Pseudopolis beyond the minimal core.
+        </p>
+    </li>
+    
+    <li>
+        <p>
+            “<a style="font-size: 110%" href="./posts/2018-08-24-competitive-advantages-recruiting.html">Competitive Advantages - Recruiting</a>”
+            ‒ <span class="soft">August 24, 2018</span><br />
+            Pseudopolis has major advantages in drawing in people.
+        </p>
+    </li>
+    
+</ul>
+
+
+<a type="application/rss+xml" href="./rss.xml">RSS feed</a>
+&nbsp;
+<a href="./posts.html">all posts</a>
+<p>
+    posts by tag: <a href="./tags/cryptocurrency.html">cryptocurrency (1)</a>, <a href="./tags/culture.html">culture (1)</a>, <a href="./tags/decisions.html">decisions (2)</a>, <a href="./tags/definition.html">definition (2)</a>, <a href="./tags/economics.html">economics (2)</a>, <a href="./tags/emacs.html">emacs (1)</a>, <a href="./tags/emotions.html">emotions (1)</a>, <a href="./tags/i3.html">i3 (2)</a>, <a href="./tags/incentives.html">incentives (1)</a>, <a href="./tags/learning.html">learning (1)</a>, <a href="./tags/linux.html">linux (1)</a>, <a href="./tags/meta.html">meta (1)</a>, <a href="./tags/nixos.html">nixos (3)</a>, <a href="./tags/personal.html">personal (1)</a>, <a href="./tags/policy.html">policy (4)</a>, <a href="./tags/programming.html">programming (4)</a>, <a href="./tags/pseudopolis.html">pseudopolis (7)</a>, <a href="./tags/technology.html">technology (1)</a>, <a href="./tags/wireguard.html">wireguard (1)</a>
+</p>
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

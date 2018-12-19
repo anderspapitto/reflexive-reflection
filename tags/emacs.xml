@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged emacs</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/emacs.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Fri, 06 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Disabling emacs window management</title>
+    <link>https://reflexivereflection.com/posts/2018-04-06-disabling-emacs-window-management.html</link>
+    <description><![CDATA[<p>I use Emacs, which is mostly great. However I also use <a href="https://i3wm.org">i3</a>, a tiling window manager, and there’s a little bit of overlap. Emacs can split frames into multiple windows and shuffle things around - but so can i3, and in fact that’s specifically what i3 is built for.</p>
+<p>I resolve this tension pretty heavy-handedly. I use only i3 for placing windows. Emacs is stripped of all power to split frames.</p>
+<p>Here’s how I get emacs to behave (annotated from <a href="https://github.com/anderspapitto/nixos-configuration/blob/master/config/init.el">my init.el</a>.</p>
+<p>The main part is configuring <code>display-buffer-alist</code>, which controls what happens when emacs wants to display a buffer.</p>
+<pre><code>(setq display-buffer-alist
+      &#39;((&quot;shell.*&quot; (display-buffer-same-window) ())
+        (&quot;.*&quot; (display-buffer-reuse-window
+               display-buffer-same-window
+               display-buffer-pop-up-frame)
+         (reusable-frames . t))))</code></pre>
+<p>This tells emacs to always raise an existing window that’s already displaying the buffer, if one exists, and otherwise to display it in the current window. There’s a slight exception for shells - when I switch to them I want them to always display in the current window, even if there’s another frame somewhere already displaying them.</p>
+<p>I override <code>display-buffer-pop-up-window</code>, which is used by some code that really wants to split the window (for example displaying grep results), to instead use the whole thing.</p>
+<pre><code>(defun anders/same-window-instead
+    (orig-fun buffer alist)
+  (display-buffer-same-window buffer nil))
+(advice-add &#39;display-buffer-pop-up-window :around &#39;anders/same-window-instead)</code></pre>
+<p>I’ve forgotten exactly what this does - but I think it tells emacs to switch to the frame that’s already displaying whatever I want to look at, if such a frame exists.</p>
+<pre><code>(defun anders/do-select-frame (orig-fun buffer &amp;rest args)
+  (let* ((old-frame (selected-frame))
+         (window (apply orig-fun buffer args))
+         (frame (window-frame window)))
+    (unless (eq frame old-frame)
+      (select-frame-set-input-focus frame))
+    (select-window window)
+    window))
+(advice-add &#39;display-buffer :around &#39;anders/do-select-frame)</code></pre>
+<p>I make transient frames (I have certain utilities that pop up a temporary frame) go away entirely when they’re done.</p>
+<pre><code>(setq frame-auto-hide-function &#39;delete-frame)</code></pre>
+<p>I completely neuter dedicated window functionality. I don’t need it, since I’m explicitly controlling all window placement anyways, and dedicated windows override a bunch of behavior and break all the other customizations.</p>
+<pre><code>(advice-add &#39;set-window-dedicated-p :around
+            (lambda (orig-fun &amp;rest args) nil))</code></pre>
+<p>There are also some package-specific fixes.</p>
+<p>Org mode</p>
+<pre><code>  (setq org-agenda-window-setup &#39;current-window)</code></pre>
+<p>Gdb</p>
+<pre><code>(setq gdb-display-io-nopopup t)</code></pre>
+<p>Compile. <code>compilation-goto-locus</code> (for jumping to compile errors or grep results) is a huge offender here. It overrides <code>display-buffer-alist</code> with a <code>let</code> binding deep inside it’s internals. There’s nothing for it but to override the whole function with a stripped-down version (still pretty long but look at the original - it’s a real beast).</p>
+<pre><code>  (defun compilation-goto-locus (msg mk end-mk)
+    &quot;Jump to an error corresponding to MSG at MK.
+All arguments are markers.  If END-MK is non-nil, mark is set there
+and overlay is highlighted between MK and END-MK.&quot;
+
+    (display-buffer (marker-buffer msg) &#39;(nil (allow-no-window . t)))
+    (with-current-buffer (marker-buffer msg)
+      (goto-char (marker-position msg))
+      (and w (compilation-set-window w msg)))
+
+    (display-buffer (marker-buffer mk))
+
+    (with-current-buffer (marker-buffer mk)
+      (unless (eq (goto-char mk) (point))
+        ;; If narrowing gets in the way of going to the right place, widen.
+        (widen)
+        (if next-error-move-function
+            (funcall next-error-move-function msg mk)
+          (goto-char mk)))
+      (if end-mk
+          (push-mark end-mk t)
+        (if mark-active (setq mark-active)))
+      ;; If hideshow got in the way of
+      ;; seeing the right place, open permanently.
+      (dolist (ov (overlays-at (point)))
+        (when (eq &#39;hs (overlay-get ov &#39;invisible))
+          (delete-overlay ov)
+          (goto-char mk))))))</code></pre>
+<p>And as a complement to that, rust-mode tries to get fancy with jumping to compile errors. Undo that too.</p>
+<pre><code>  (eval-after-load &#39;compile
+    (remove-hook &#39;next-error-hook &#39;rustc-scroll-down-after-next-error)))</code></pre>
+<p>There’s probably more interactions I’ll discover with various packages, but on the whole this has been working for me quite well.</p>]]></description>
+    <pubDate>Fri, 06 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-06-disabling-emacs-window-management.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

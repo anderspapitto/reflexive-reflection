@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - .deb installation in NixOS</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="../index.html">Home</a>
+            <a href="../posts.html">All Posts</a>
+            <a href="../contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="../tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>.deb installation in NixOS</h1>
+<div class="soft">
+    This is by now quite an old post. There's probably a better way, but I leave it here for reference.<br />
+    February 28, 2015 (<a href="../tags/nixos.html">nixos</a>)
+</div>
+
+<p>Since the nixpkgs repository is not yet as comprehensive as those of more established distributions, it can be useful to borrow some of their packages - without having to recompile from source - without having to use heavyweight solutions like VirtualBox or Docker</p>
+<p>Here I’ll walk through installing the Debian-packaged <code>hello</code> program.</p>
+<p>First we’ll make a directory to play around in, and download the deb file.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="fu">mkdir</span> ~/deb-playground <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> ~/deb-playground</a>
+<a class="sourceLine" id="cb1-2" title="2">$ <span class="fu">wget</span> -q http://ftp.us.debian.org/debian/pool/main/h/hello-traditional/hello-traditional_2.9-2_amd64.deb</a></code></pre></div>
+<p>We can install dpkg (to interact with .deb files) and use it to unpack our download.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="ex">nix-env</span> -i dpkg</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">installing</span> ‘dpkg-1.16.9’</a>
+<a class="sourceLine" id="cb2-3" title="3">$ <span class="ex">dpkg</span> -x hello-traditional_2.9-2_amd64.deb unpacked-hello</a></code></pre></div>
+<p>Our unpacked hello contains the precompiled binary, but we can’t run it directly (assuming that you are on a pure NixOS system, with a clean /usr). Trying to do so will give us an incredibly misleading error message.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="fu">ls</span> unpacked-hello/usr/bin/</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">hello</span></a>
+<a class="sourceLine" id="cb3-3" title="3">$ <span class="ex">./unpacked-hello/usr/bin/hello</span></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="ex">bash</span>: ./unpacked-hello/usr/bin/hello: No such file or directory</a></code></pre></div>
+<p>The binary does exist at that location, regardless of what bash tells us. However, what does not exist is the ELF interpreter which the binary is requesting in order to run. We can see which interpreter that by inspecting the binary with a couple of different tools.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="ex">nix-env</span> -i patchelf binutils</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">warning</span>: there are multiple derivations named ‘binutils-2.23.1’<span class="kw">;</span> <span class="ex">using</span> the first one</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">installing</span> ‘patchelf-0.8’</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">installing</span> ‘binutils-2.23.1’</a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="ex">building</span> path(s) ‘<span class="ex">/nix/store</span>/<span class="ex">pxyqbr13z028x57fymvyxzy1wbwqf0wp-user-environment</span>’</a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="ex">created</span> 437 symlinks in user environment</a>
+<a class="sourceLine" id="cb4-7" title="7">$ <span class="ex">patchelf</span> --print-interpreter ./unpacked-hello/usr/bin/hello</a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="ex">/lib64/ld-linux-x86-64.so.2</span></a>
+<a class="sourceLine" id="cb4-9" title="9">$ <span class="ex">readelf</span> -a ./unpacked-hello/usr/bin/hello <span class="kw">|</span> <span class="fu">grep</span> interpreter</a>
+<a class="sourceLine" id="cb4-10" title="10">      [<span class="ex">Requesting</span> program interpreter: /lib64/ld-linux-x86-64.so.2]</a></code></pre></div>
+<p>On a NixOS system, the interpreter is somewhere in <code>/nix/store</code> rather than in <code>/lib64</code>, which we can confirm with a couple commands</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="fu">ls</span> /lib64/ld-linux-x86-64.so.2</a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="ex">ls</span>: cannot access /lib64/ld-linux-x86-64.so.2: No such file or directory</a>
+<a class="sourceLine" id="cb5-3" title="3">$ <span class="fu">ls</span> /nix/store/*glibc*/lib/ld-linux-*</a>
+<a class="sourceLine" id="cb5-4" title="4"><span class="ex">/nix/store/211nv7bsm5nxblp9r5k3fmqf2y8yfg11-glibc-2.20/lib/ld-linux-x86-64.so.2</span></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="ex">/nix/store/5d59qvn7zj78dwwdn0d6nf2669xs9g30-glibc-multi-2.20/lib/ld-linux-x86-64.so.2</span></a></code></pre></div>
+<p>As a side note, we can still run the binary by explicitly specifying the interpreter path, similar to how a script’s shebang line can be overridden by invoking the interpreter directly.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="ex">/nix/store/211nv7bsm5nxblp9r5k3fmqf2y8yfg11-glibc-2.20/lib/ld-linux-x86-64.so.2</span> ./unpacked-hello/usr/bin/hello</a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="ex">Hello</span>, world!</a></code></pre></div>
+<p>However, for a more integrated approach we will use buildFHSUserEnv, a utility package that will construct a more traditional filesystem layout, mounted read-only inside a chroot (FHS is Filesystem Heirarchy Standard http://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard). We start with a basic nix description gives us a shell in such an environment, as well as access to dpkg.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$ <span class="fu">cat</span> fhs-env.nix</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="bu">let</span> nixpkgs = import <span class="op">&lt;</span>nixpkgs<span class="op">&gt;</span> {};</a>
+<a class="sourceLine" id="cb7-3" title="3"><span class="kw">in</span> <span class="ex">rec</span> {</a>
+<a class="sourceLine" id="cb7-4" title="4">  <span class="ex">fhsEnv</span> = nixpkgs.buildFHSUserEnv {</a>
+<a class="sourceLine" id="cb7-5" title="5">    <span class="ex">name</span> = <span class="st">&quot;fhs&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb7-6" title="6">    <span class="ex">targetPkgs</span> = pkgs: []<span class="kw">;</span></a>
+<a class="sourceLine" id="cb7-7" title="7">    <span class="ex">multiPkgs</span> = pkgs: [ pkgs.dpkg ]<span class="kw">;</span></a>
+<a class="sourceLine" id="cb7-8" title="8">    <span class="ex">runScript</span> = <span class="st">&quot;bash&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb7-9" title="9">  };</a>
+<a class="sourceLine" id="cb7-10" title="10">}</a></code></pre></div>
+<p>Then we can build the environment and enter it. We haven’t yet incorporated our debian package, so <code>hello</code> will be unavailable.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$ <span class="ex">nix-build</span> -A fhsEnv fhs-env.nix</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">/nix/store/xi84kzfhxvdn3f748v1cpl8mpkjhag7f-fhs-userenv</span></a>
+<a class="sourceLine" id="cb8-3" title="3">$ <span class="ex">./result/bin/fhs</span></a>
+<a class="sourceLine" id="cb8-4" title="4">$ <span class="bu">pwd</span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="ex">/</span></a>
+<a class="sourceLine" id="cb8-6" title="6">$ <span class="ex">dpkg</span> --version</a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="ex">Debian</span> <span class="kw">`</span><span class="ex">dpkg</span><span class="st">' package management program version 1.16.9 (amd64).</span></a>
+<a class="sourceLine" id="cb8-8" title="8"><span class="st">This is free software; see the GNU General Public License version 2 or</span></a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="st">later for copying conditions. There is NO warranty.</span></a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="st">$ hello</span></a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="st">bash: hello: command not found</span></a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="st">$ exit</span></a></code></pre></div>
+<p>We want to incorporate the <code>hello</code> package by including it in the <code>targetPkgs</code> list in our nix expression. However to do so we fist need to wrap it in a nix expression. We can first do this standalone, without worrying about the FHS aspect.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$ <span class="fu">cat</span> dumb-hello.nix</a>
+<a class="sourceLine" id="cb9-2" title="2"><span class="bu">let</span> nixpkgs = import <span class="op">&lt;</span>nixpkgs<span class="op">&gt;</span> {};</a>
+<a class="sourceLine" id="cb9-3" title="3">    <span class="ex">stdenv</span> = nixpkgs.stdenv<span class="kw">;</span></a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="kw">in</span> <span class="ex">rec</span> {</a>
+<a class="sourceLine" id="cb9-5" title="5">  <span class="ex">dumb-hello</span> = stdenv.mkDerivation {</a>
+<a class="sourceLine" id="cb9-6" title="6">    <span class="ex">name</span> = <span class="st">&quot;dumb-hello&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb9-7" title="7">    <span class="ex">builder</span> = ./builder.sh<span class="kw">;</span></a>
+<a class="sourceLine" id="cb9-8" title="8">    <span class="ex">dpkg</span> = nixpkgs.dpkg<span class="kw">;</span></a>
+<a class="sourceLine" id="cb9-9" title="9">    <span class="ex">src</span> = nixpkgs.fetchurl {</a>
+<a class="sourceLine" id="cb9-10" title="10">      <span class="ex">url</span> = <span class="st">&quot;http://ftp.us.debian.org/debian/pool/main/h/hello-traditional/hello-traditional_2.9-2_amd64.deb&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb9-11" title="11">      <span class="ex">md5</span> = <span class="st">&quot;f5f3c28b65221dae44dda6f242c23316&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb9-12" title="12">    };</a>
+<a class="sourceLine" id="cb9-13" title="13">  };</a>
+<a class="sourceLine" id="cb9-14" title="14">}</a></code></pre></div>
+<p>We’ll also need a builder script which unpacks the .deb with dpkg and places the files in the correct location.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$ <span class="fu">cat</span> builder.sh</a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="bu">source</span> <span class="va">$stdenv</span>/setup</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="va">PATH=$dpkg</span>/bin:<span class="va">$PATH</span></a>
+<a class="sourceLine" id="cb10-4" title="4"></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="ex">dpkg</span> -x <span class="va">$src</span> unpacked</a>
+<a class="sourceLine" id="cb10-6" title="6"></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="fu">cp</span> -r unpacked/* <span class="va">$out</span>/</a></code></pre></div>
+<p>Now we can build this package, which exposes the hello binary from the .deb. However we will still be unable to run it due to the interpreter issues.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$ <span class="ex">nix-build</span> -A dumb-hello dumb-hello.nix</a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="ex">/nix/store/qaygcmg5kb2gknmzb3miczvr2n001mil-dumb-hello</span></a>
+<a class="sourceLine" id="cb11-3" title="3">$ <span class="fu">ls</span> ./result/bin/</a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="ex">hello</span></a>
+<a class="sourceLine" id="cb11-5" title="5">$ <span class="ex">./result/bin/hello</span></a>
+<a class="sourceLine" id="cb11-6" title="6"><span class="ex">bash</span>: ./result/bin/hello: No such file or directory</a></code></pre></div>
+<p>The final step is to combine the two nix expressions, so that our FHS environment includes the hello package.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1">$ <span class="fu">cat</span> full-hello.nix</a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="bu">let</span> nixpkgs = import <span class="op">&lt;</span>nixpkgs<span class="op">&gt;</span> {};</a>
+<a class="sourceLine" id="cb12-3" title="3">    <span class="ex">stdenv</span> = nixpkgs.stdenv<span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="kw">in</span> <span class="ex">rec</span> {</a>
+<a class="sourceLine" id="cb12-5" title="5">  <span class="ex">dumb-hello</span> = stdenv.mkDerivation {</a>
+<a class="sourceLine" id="cb12-6" title="6">    <span class="ex">name</span> = <span class="st">&quot;dumb-hello&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-7" title="7">    <span class="ex">builder</span> = ./builder.sh<span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-8" title="8">    <span class="ex">dpkg</span> = nixpkgs.dpkg<span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-9" title="9">    <span class="ex">src</span> = nixpkgs.fetchurl {</a>
+<a class="sourceLine" id="cb12-10" title="10">      <span class="ex">url</span> = <span class="st">&quot;http://ftp.us.debian.org/debian/pool/main/h/hello-traditional/hello-traditional_2.9-2_amd64.deb&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-11" title="11">      <span class="ex">md5</span> = <span class="st">&quot;f5f3c28b65221dae44dda6f242c23316&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-12" title="12">    };</a>
+<a class="sourceLine" id="cb12-13" title="13">  };</a>
+<a class="sourceLine" id="cb12-14" title="14">  <span class="ex">full-hello</span> = nixpkgs.buildFHSUserEnv {</a>
+<a class="sourceLine" id="cb12-15" title="15">    <span class="ex">name</span> = <span class="st">&quot;full-hello&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-16" title="16">    <span class="ex">targetPkgs</span> = pkgs: [ dumb-hello ]<span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-17" title="17">    <span class="ex">multiPkgs</span> = pkgs: [ pkgs.dpkg ]<span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-18" title="18">    <span class="ex">runScript</span> = <span class="st">&quot;hello&quot;</span><span class="kw">;</span></a>
+<a class="sourceLine" id="cb12-19" title="19">  };</a>
+<a class="sourceLine" id="cb12-20" title="20">}</a></code></pre></div>
+<p>All done! We can build our expression, activate it to enter the environment, and run our debian-packaged binary.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$ <span class="ex">nix-build</span> -A full-hello full-hello.nix</a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="ex">/nix/store/j2cnf3bnzpd97qxavrxgk58dk7cmcrlf-full-hello-userenv</span></a>
+<a class="sourceLine" id="cb13-3" title="3">[<span class="ex">anders@gurney</span>:~/deb-playground]</a>
+<a class="sourceLine" id="cb13-4" title="4">$ <span class="ex">./result/bin/full-hello</span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="ex">Hello</span>, world!</a></code></pre></div>
+<p>It looks like it’s not possible to pass arguments through, but it could be enabled by a straightforward modification to the buildFHSUserEnv package in the future.</p>
+
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

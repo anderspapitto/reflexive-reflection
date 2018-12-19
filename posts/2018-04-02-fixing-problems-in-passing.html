@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - Fixing problems in passing</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="../index.html">Home</a>
+            <a href="../posts.html">All Posts</a>
+            <a href="../contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="../tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>Fixing problems in passing</h1>
+<div class="soft">
+    Why to solve a problem other than the one facing you.<br />
+    April  2, 2018 (<a href="../tags/policy.html">policy</a>, <a href="../tags/programming.html">programming</a>)
+</div>
+
+<p>Sometimes a problem shows up, and it’s easy to figure out a straightforward solution. So - should you go ahead and fix that problem with that solution? Sometimes yes, sometimes no. I’m going to explore some of the “no” situations.</p>
+<p>I claim that you should be reluctant to engage with a problem directly when it’s possible to fix it “in passing”, or in other words when you can focus on something else that just happens to make the problem go away, or be less severe.</p>
+<p>Let’s look at a few examples.</p>
+<p>This is super common with technology. Technology always has imperfections, can always be fixed and improved in small ways. Also, technology tends to go obsolete and get replaced with something much better - and anytime you can avoid fixing problems with something that’s about to be obsolete, it’s a big advantage.</p>
+<p>Example 1 - Printers. They could be faster, cheaper, more efficient, jam less, be simpler, etc. etc. Also, all of that matters a whole lot less now that email exists than it did before. So - not entirely, but largely - building better printers is a bad use of time relative to inventing the internet.</p>
+<p>This can also apply at the intersection between technology and lots of other things, like ethics.</p>
+<p>Example 2 - Eating meat. There’s some moral arguments against killing animals for food. A straightforward solution, that could work with enough effort, is to convince many many people to stop eating meat. An indirect solution, which could fix this in passing, is to figure out how to make lab-grown meat that’s just as good and much cheaper. This might fix 90% of the problem with 2% of the people-convincing effort.</p>
+<p>Or it can apply in pure politics</p>
+<p>Example 3 - One form of accepted corruption in the US is that police get get-out-of-traffic-ticket-free cards to hand out to friends/family/etc. The direct solution is to demand reform, and have some enforcer make sure this doesn’t happen. An in-passing solution is to invest in public transit and self driving cars, so that speeding tickets become a thing of the past, and take related corruption with them.</p>
+<p>Or it can apply in some personal efforts.</p>
+<p>Example 4 - If I can do five pushups and would like to do twenty, I can do some pushups every day until I get much stronger. Or, I can lose 40 pounds and that might do the trick on it’s own, or get me most of the way there.</p>
+<p>Example 5 - If I find out my boss is underpaying me, the straightforward approach is to negotiate for more money, or to go out and interview for a higher-paying job. An in-passing solution might be to go to med school.</p>
+<p>So, overall nothing novel but I like it as a principle that connects these type of situations.</p>
+<p>In general, if I know that it’s possible to alleviate a problem by making some more-general situation better, I’ll be skeptical of tackling the more specific problem head-on. Though of course it’s not an absolute.</p>
+
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

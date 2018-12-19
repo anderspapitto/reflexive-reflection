@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged personal</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/personal.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Thu, 05 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Learning 5000 German words on Memrise</title>
+    <link>https://reflexivereflection.com/posts/2018-04-05-finishing-memrise.html</link>
+    <description><![CDATA[<p>I’ve recently gotten through learning the 5000 most popular German words (roughly; the list’s not perfect) on <a href="https://www.memrise.com/course/47049/5000-words-top-87-sorted-by-frequency/">memrise</a>, and it’s been pretty good.</p>
+<p>Memrise is a spaced-repetition program wrapped in a website, and it so happened that someone had added exactly why I was after - a list of the most common words, sorted by frequency.</p>
+<p>I skipped roughly the first 750 words from prior experience, and slogged my way through the remainder over about 8 months. My eventual steady-state pace was to review about 200 words per day and then do 15 new words. I didn’t count, but it probably took 40 minutes a day, broken up into any convenient configuration.</p>
+<p>There’s a lot of sub-skills of language learning, and this only helps with vocabulary. I’m quite ok with this though - learning vocab is a big pile of work that has to be done eventually, and doing it like this comes with basically zero overhead from organization and planning, which I find to be pretty important to working on a skill in the background. I’m a little behind now with grammar and speaking and all that, but it should come much faster when I already know all the words.</p>
+<p>A couple concrete things could have been better about the tooling. I would have liked for word stems to be prioritized above the derived words - for example putting “Hof” before “Bahnhof”, even though the latter is much more common in practice. And also the treatment of synonyms and near-synonyms could probably be better, though I’m not sure how. As it is I’m left with some weird quirks, like knowing that “pleasant” means whichever of “angenehm” and “sympathisch” I didn’t just encounter five minutes ago.</p>
+<p>Next time, I’ll probably use some local program instead of a website. I’m not interested in the all the add-on features, and in the meantime needing internet access and having limited control of the word scheduling and so on are all little hassles that I don’t want to deal with.</p>]]></description>
+    <pubDate>Thu, 05 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-05-finishing-memrise.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

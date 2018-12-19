@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged definition</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/definition.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Sun, 15 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Heuristics</title>
+    <link>https://reflexivereflection.com/posts/2018-04-15-heuristics.html</link>
+    <description><![CDATA[<p>I’ve written before that <a href="https://reflexivereflection.com/posts/2018-04-12-good-decisions-are-expensive.hmtl">making decisions is really hard</a>. I want to dig into that a little more by introducing some useful terminology that I encounter frequently in programming contexts, but quite rarely in any other.</p>
+<p>So - ‘heuristic’.</p>
+<p>A heuristic is a decision-making tool. It’s a way to answer hard questions by finding a similar question that’s easier, and answering that one instead.</p>
+<p>Heuristics don’t give you the right answers (there’s another word, ‘oracle’, for things that magically give correct answers). They can be wrong sometimes, or often, or always. They can be wrong predictably and systemically, or totally at random. They might overestimate or they might underestimate. They may work today and not tomorrow.</p>
+<p>And they’re also absolutely everywhere. They’re in our courts, they’re in our governments. They’re in our societal norms and generational wisdom and also in our prejudices and our relationships and in our streetlights.</p>
+<p>So why would anyone use a tool that gives all sorts of wrong answers? Well, because the answers aren’t entirely useless - they’re close, or they’re sometimes or often or usually right. And they are ((much) much) easier and faster and cheaper to figure out, and that matters a lot.</p>
+<h2 id="examples">Examples</h2>
+<p>So let’s look at some examples.</p>
+<p>Example 1 - when you see someone that you haven’t seen for a couple years, a heuristic that you can use to predict whether you’ll get along with them is to ask if you got along with them the last time you saw them.</p>
+<p>It’s clearly not perfect. They may have changed, for better or for worse. You may have changed. Etc, etc. So if you use this heuristic you might be wrong. But it’s probably going to bear some resemblance to the truth, and it’s dead easy, takes all of half a second. What’s the alternative, if you wanted to be more accurate? Well, you could call up all of your mutual acquantainces, and ask about this person. You could look them up on some social networks, and so on. That would give you a much better sense of whether anything’s changed. But it’s a hell of a lot more work.</p>
+<p>Example 2 - using popular tools. “I use git because other people use git.” “I drive such-and-such a car because so do other people in such-and-such situation”.</p>
+<p>These can definitely be part network effect, but even setting that aside, there’s still a solid reason to use the same stuff as everyone else - you get to piggyback on everyone else’s hard decision-work of figuring out what’s worth using. The wisdom of the crowds is definitely not perfect, and you might make some really bad choices and miss out on some really great less-popular tools if you choose to go with it - but boy is it less work than doing exhaustive research on the construction industry every time you go to pick up a hammer.</p>
+<p>Example 3 - the criminal justice system</p>
+<p>A criminal justice system is a heuristic attempt to assign criminals to prison and non-criminals to freedom. It messes up in both directions - innocent people locked up, guilty people walking free (though it’s interesting to note that the phrase “beyond a reasonable doubt” in the US implies it’s intended to be a conservative heuristic - one that is guaranteed to not make mistakes in the “worse” direction).</p>
+<p>What would a replacement look like that isn’t a heuristic, that is always correct? Well, given that saying a particular thing in a locked room with a certain intent in your mind can be the difference between is-a-crime and is-not-a-crime, it would have to involve constant video and audio and mind-reading surviellance of every single human. Without getting into the moral aspects, if you tried to translate that into a 2018 dollar cost it’s clearly impossible - and so instead we’re stuck with heuristics.</p>
+<p>Example 4 - xenophobia</p>
+<p>Now we’re entering some dangerous territory, so let’s just touch this briefly. But I think it’s important to realize that some of the least-pleasant heuristics that people use are also serving some purpose to some people. In this case, all it takes is to realize “hey, people I grew up with are less likely to shoot me than people I didn’t grow up with.” And again - not always accurate, but it sometimes gives you something that approximates truth. And “have I known this face for my whole life” goes through the human brain a lot faster than running criminal background checks on everyone you shake hands with.</p>
+<h2 id="other-thoughts">Other thoughts</h2>
+<p>People are constantly noticing that importance decisions are made heuristically. There’s often a reaction along the lines of “this is so broken! doesn’t anyone realize that the decisions are completely wrong in such-and-such a case, or under such-and-such circumstances?”</p>
+<p>Well, yes. But it’s not always enough to recognize that people are employing heuristics. It’s not even always enough to recognize that people are employing heuristics, to characterize the ways in which those heuristics break down, and to propose an alternative which is significantly more accurate.</p>
+<p>You probably also have to find a way to make your alternative as easy and cheap and fast and convenient as whatever you’re trying to replace, because making decisions is Real Work and you can’t handwave it away.</p>
+<p>(and then there’s some extra problems tacked on, like overcoming entrenched network effects or other types of initial-resource imbalances - but let’s not get into that now.)</p>]]></description>
+    <pubDate>Sun, 15 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-15-heuristics.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>What is sadness?</title>
+    <link>https://reflexivereflection.com/posts/2018-04-10-what-is-sadness.html</link>
+    <description><![CDATA[<p>Wikipedia says</p>
+<p>“Sadness is an emotional pain associated with, or characterized by, feelings of disadvantage, loss, despair, grief, helplessness, disappointment and sorrow.”</p>
+<p>I think I can do it more concisely.</p>
+<p>Sadness is desire coupled with the understanding that said desire cannot be realized.</p>
+<p>Actually there’s one case that doesn’t fit into this neatly, which is empathic sadness. But I think it covers all cases of being sad on one’s own behalf.</p>]]></description>
+    <pubDate>Tue, 10 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-10-what-is-sadness.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

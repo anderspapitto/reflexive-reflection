@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - Why NixOS?</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="../index.html">Home</a>
+            <a href="../posts.html">All Posts</a>
+            <a href="../contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="../tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>Why NixOS?</h1>
+<div class="soft">
+    Nix is amazing, but the comparisons can be confusing.<br />
+    June  5, 2016 (<a href="../tags/nixos.html">nixos</a>)
+</div>
+
+<p>Nix is one of the most powerful tools that I’m aware of. A huge amount of effort has been and continues to be put into the problems of building and packaging software, of defining environments and dependencies and configurations.</p>
+<p>Nix generalizes every other tool in this space. What you can do with another packaging solution you can do with Nix; but at the same time there’s plenty that you can do with Nix that you can’t do with other tools. Here’s a few such tools.</p>
+<ul>
+<li>apt-get, emerge, pacman</li>
+<li>pip, virtualenv, anaconda, cargo, cabal, stack, gem, rbenv, npm</li>
+<li>docker</li>
+<li>PlayOnLinux</li>
+<li>vendored C/C++ dependencies</li>
+<li>debian multiarch</li>
+<li>homebrew, macports, pkg-src</li>
+<li>etckeeper</li>
+<li>Coreos</li>
+<li>Cloud Formations, Terraform</li>
+<li>package.el, vundle, apm</li>
+</ul>
+<p>If you’re using <code>emerge</code> to build your kernel from source with customized build flags - Nix can do this for you as well. And it also gives you a transactional system-wide rollback when the power cuts out halfway through the upgrade.</p>
+<p>If you’re using pip and virtualenv to define project-specific python dependencies - Nix can do that too, and at the same time fully manage all the C extensions and compilers. And everything can be downloaded precompiled from the build farm, and shared on disk between any number of different projects.</p>
+<p>If you’re overhauling Debian to provide multi-arch support, so that you can have two or three special-cased architectures side-by-side on the filesystem, you can instead use Nix, where this is baked into the core and you can have ten thousand flavors of gcc without a hint of interference between them.</p>
+<p>If you’re using homebrew to install miscellaneous shell utilities on your MacBook without needing root - you can do that with Nix as well, and by the way your package expressions will parametrically work just the same on your Linux servers.</p>
+<p>It’s a similar story with pretty much everything else. There are certainly cases where Nix isn’t yet as polished as a more common and specific tool (for example, Windows support, compared to say OneGet), but it’s never a fundamental limitation, whereas in the other direction it usually is (for example, it’s totally out of scope for Emacs’ package.el to learn how to deal with ruby dependency management).</p>
+
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

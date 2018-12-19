@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged technology</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/technology.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Sat, 14 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>True Names by hashing genomes</title>
+    <link>https://reflexivereflection.com/posts/2018-04-14-true-names-by-hashing-genomes.html</link>
+    <description><![CDATA[<h1 id="true-names">True Names</h1>
+<p>True names have always been a fascinating concept. Crack open a few of your favorite mythology texts or religious books or fantasy novels and you won’t get far before some person or spirit is being bound into service after letting their true name slip (I recommend <code>The Amulet of Samarkand</code> for an excellent treatment).</p>
+<p>In the real world though, they’ve been an eternal pipe dream. Suppose your long-lost uncle comes back from his travels overseas and tells you on his deathbed “I’ve met this fantastic individual who will lead you to salvation/give you a bunch of money/whatever. Go seek him out, his name is Bob.” Well that’s great, but how are you ever going to single out the one true Bob from all the pretenders? This has always been an unsolvable problem.</p>
+<p>In today’s world, you might have some extra tools. You might have a photo to go off of, you might have a full name and an address and a social security number and the birthdate of the childhood dog.</p>
+<p>But these can all break down one way or another. What if they’re a political refugee (a real risk of doing business when your business is handing out salvations and fortunes) and don’t have a government ID? What if they’re a spy and the government ID is fake, and by the way the NSA knows not only the dog’s birthdate but also its favorite toy?</p>
+<p>So you can muddle by with this stuff, but it’s reasonable to ask for something better.</p>
+<h1 id="existing-solutions">Existing Solutions</h1>
+<p>Let’s briefly review what’s out there, and what kind of problems they have.</p>
+<h2 id="national-id-systems">National ID systems</h2>
+<p>The best of these can be pretty good, but they have some downsides.</p>
+<p>By far the biggest is that they rely on national governments to set up and manage them, and for that reason they only cover a fraction of the world’s population. For example, the US has no such system. We can design something that doesn’t rely on a centralized authority and is accessible to everyone.</p>
+<h2 id="gpg-and-other-cryptography-schemes">GPG and other cryptography schemes</h2>
+<p>These also work pretty well for some things. They break down somewhat at the point where they tie back to real humans though. They can be freely created, so there is no guarantee that each one corresponds to a unique person. If they are accidentally destroyed there is no recovery possible, and if they are stolen there is no way to regain control. If we can design a better system for providing True Names to people, this stuff can still be incredibly useful when layered on top of the True Names.</p>
+<h2 id="social-security-id">Social Security ID</h2>
+<p>In the US, SSIDs often get shoehorned into this role. However for this purpose they’re terrible and insecure for lots of well-known reasons that I won’t rehash here.</p>
+<h1 id="the-plan">The Plan</h1>
+<p>Here’s how True Names work: take a single, globally known cryptographic hash function, along with a single, globally known set of initializing parameters. Your True Name is the result of that hash applied to your full genome.</p>
+<p>Done.</p>
+<h1 id="the-rest-of-the-plan">The Rest of the Plan</h1>
+<p>Ok, actually yes there is more. But that is the core idea, and it has some powerful properties. Let’s introduce some terminology so that we can examine them.</p>
+<p>An Individual is a human who has an identity. Generally what an Individual wants out of the system is to be able to own their own identity - that is, to be able to prove who they are, and to prevent anyone else from claiming to be them.</p>
+<p>An Entity is some human or organization (e.g. your neighbor, your employer, Walmart, France) that wants to interact with Individuals, and wants to be able to know and verify their identities (and we’ll actually generalize this a bit later on).</p>
+<p>A Verifier is something that we’ll introduce in a bit.</p>
+<p>So, the basic scenario to solve is: an Individual and an Entity want to interact, and the Entity wants to know that the Individual is really who they are claiming to be. For example, maybe the Individual wants to purchase something from the Entity’s online store, and the Entity wants to make sure it’s not fraud.</p>
+<h2 id="naive-verification">Naive Verification</h2>
+<p>There’s a straightforward implementation. This is NOT what I’m proposing, but let’s consider it as a stepping stone.</p>
+<p>The straightforward, bad implementation is that when an Individual wants to prove who they are to an Entity, they provide a DNA sample directly to the Entity, who sequences it, hashes it, and confirms that it matches the True Name which the Individual is claiming. This is terrible.</p>
+<ul>
+<li>Every time that an Individual interacts with an Entity, they have to give that Entity not just their True Name, but also their full genome.</li>
+<li>Every verification must be in-person, to verify that the dna sample is from the correct Individual.</li>
+<li>Every verification is slow and expensive, because it requires sequencing the genome.</li>
+</ul>
+<h2 id="intermediated-verification">Intermediated Verification</h2>
+<p>All of these can be adressed by introducing a set of intermediaries, the Verifiers. Rather than Individuals proving themselves directly to Entities, they prove themselves to Verifiers, and the Verifiers give them a signed private key that can in turn be used to demonstrate to Entities that the issuing Verifier has in fact verified that Individual.</p>
+<p>So in a sense, it’s very similar to a government ID program - you prove who you are to a government, they provide you with an ID, and then you use the ID to talk to third parties.</p>
+<p>There are some key differences though. For one thing, government-based IDs require governments that are willing to issue IDs. If the government is non-existent or makes mistakes or is untrustworthy or doesn’t want to assign IDs, then this doesn’t work.</p>
+<p>Because in this scheme the mapping of Individual to True Name is deterministic and therefore doesn’t depend on the Verifier, we don’t need a single privileged Verifier. There can be any number of them, and no matter which one a particular Individual goes to, they will produce the same True Name.</p>
+<p>There is also no necessity to deal with any particular Verifier. With national IDs, Individuals only have one option for who can issue them an identity. And Entities have to deal with whatever the Individual can provide.</p>
+<p>In the True Name system, both Individuals and Entities have complete freedom to decide which Verifiers they trust and are willing to deal with. For any pairing of an Individual and an Entity, as long as there is one Verifier that both of them trust, the Individual can go to that Verifier to obtain a private key that the Entity will trust.</p>
+<h1 id="reclaiming-identities">Reclaiming Identities</h1>
+<p>So, when an Individual goes to a Verifier, they recieve a private key. That private key acts as evidence of being that Individual - but it could be lost or stolen. So what then?</p>
+<p>Well, the Individual simply goes back to the Verifier, says “the key was lost/stolen”, and the Verifier invalidates the previous key and issues a new one. Again similar to a national ID scheme, the Verifier is actually who has control over the identity (this sounds like a downside but we’ll address it later), which means that losses and thefts are reversible.</p>
+<h1 id="arbitrarily-flexible-trust">Arbitrarily Flexible Trust</h1>
+<p>So, the system starts to seem a little weak to bad-acting Verifiers. If they’re actually in control of all they keys, how can you know they won’t start lying about them or impersonating customers or anything?</p>
+<p>The answer has two parts.</p>
+<p>The first part is that since Verifiers all provide the same service, there is a market and competition arises between them, which rewards trustworthiness and pushes out abusive participants.</p>
+<p>The second part is that you can actually combine or split keys. For example, you could pick three Verifiers, one based in the US, one based in China, and one in Switzerland, and you could configure your bank account to be controlled by any two of the three. Then even if one of those goverments forces the Verifier to confiscate your funds, you’re safe unless they also collude against you with the other governments.</p>
+<p>This also has applications for online commerce type interactions. An Entity can choose not only which Verifiers they trust, but which combinations - for example by requiring verification by either</p>
+<ul>
+<li>any reputable local Verifier</li>
+</ul>
+<p>OR</p>
+<ul>
+<li>any Verifier directly run by some national government.</li>
+</ul>
+<h1 id="reclaiming-accounts">Reclaiming Accounts</h1>
+<p>In addition to regaining control over the True Name itself, this setup allows allows a pretty lightweight way to retain control over accounts. For example, consider that you lose control of your gmail account. It’s a huge hassle to recover it, because while in a creepy way Google knows everything about you, in a practical way they also have no idea who you are.</p>
+<p>However, when you sign up for an account, you could additionally provide a True Name, and a list of Verifiers that you trust. Anyone able to prove to one of those Verifiers that they are you would be able to take over the account at any time - and conveniently, only you can prove that you are you.</p>
+<p>As a special case of keys being lost, this also can allow for reasonable treatments of keys belonging to people who die - if you used this as the source of control over your cryptocurrencies, then it’s still technically possible for the Verifiers to pass control on to your children.</p>
+<h1 id="im-not-a-bot">I’m not a bot</h1>
+<p>There are also some interesting services that can be built on top of this. For example, one consequence of True Names is that everyone only has one. But a service could be built that consumes True Names and runs them through arbitrary other hash functions, to produce a greater supply of uncorrelated identities. These could be used by, for example, an online forum that doesn’t care exactly who you are, but that does want to enforce that there is a real, unique human behind every account.</p>
+<h1 id="can-this-really-happen">Can this really happen?</h1>
+<p>The main two obstacles are</p>
+<ul>
+<li><p>cost of dna sequencing, which is on a downward march.</p></li>
+<li><p>competition. For example, if the US goverment decides to roll out a high-quality national ID system, then the practical need for this type of scheme is reduced.</p></li>
+</ul>
+<h1 id="and-more">And more</h1>
+<p>This is a partial treatment. I covered most of the basics, but it’s quite long already so I’ll cut it short.</p>]]></description>
+    <pubDate>Sat, 14 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-14-true-names-by-hashing-genomes.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

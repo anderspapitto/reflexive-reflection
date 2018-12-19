@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged incentives</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/incentives.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Fri, 13 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>The case against other people gambling</title>
+    <link>https://reflexivereflection.com/posts/2018-04-13-the-case-against-other-people-gambling.html</link>
+    <description><![CDATA[<p>I, as a person, don’t want you, as another person, to be gambling.</p>
+<p>And that’s actually true for everyone in a modern society - or at least it is if you generalize a bit and state it as</p>
+<p>Every individual in a modern society has an incentive to prevent other individuals from gambling.</p>
+<p>Of course, that incentive isn’t absolute, and plenty of people will probably object with something like “I believe in individual freedom and would never stop someone from gambling if they want to”. Sure, that may be the final choice, but the incentive still exists even if you disregard it.</p>
+<p>The incentive works like this:</p>
+<p>I want to live in a society that takes care of unfortunate people.</p>
+<p>Now, taking care of unfortunate people has a cost. But I have a certain expectation of how many people are unfortunate and for what reasons and what type of help they need, and so forth, and with all this in mind I’m willing to accept the cost.</p>
+<p>So that’s great. But now if people start gambling (and actually this can be any similiar risky activity, e.g. these days it would be buying cryptocurrencies), they make it harder and more expensive to sustain this safety net which I’d like to have.</p>
+<p>Roughly speaking, when someone gambles there are three outcomes.</p>
+<ul>
+<li>They come out about even. Eh, who cares</li>
+<li>They win a bunch of money. Other people getting piles of money by fluke is somewhere between a “who cares” and “this hurts my interests”, because now they can outcompete me for houses and other stuff that money is spent on. I might be willing to tolerate this, but I don’t want to encourage more of it.</li>
+<li>They lose a bunch of money. This is the bad part, because they are now an Unfortunate Person. Now there’s a tricy situation. Either we have to take care of them as an Unfortunate Person, which is suboptimal because it’s an extra cost and this didn’t have to happen, or we have to start judging Unfortunate People on whether they’re “justified” in being in that situation. It would be better if we could just prevent this case from ever happening - which precisely means preventing them from gambling.</li>
+</ul>
+<p>There’s clearly a lot of other things going on, but this is the one particular tension which I wanted to highlight.</p>
+<p>Allowing people to do risky things directly conflicts with the effectiveness of any sort of social safety net program. I don’t necessarily follow this to any particular policy conclusion, but I do recognize that any tradeoff here is going to be sacrificing something.</p>]]></description>
+    <pubDate>Fri, 13 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-13-the-case-against-other-people-gambling.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

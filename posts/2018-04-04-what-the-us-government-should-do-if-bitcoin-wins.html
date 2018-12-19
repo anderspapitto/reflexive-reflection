@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+
+        <title>Reflexive Reflection - What the US government should do if Bitcoin wins</title>
+
+        <!-- Stylesheets. -->
+        <link rel="stylesheet" type="text/css" href="../style.css" />
+
+        <!-- RSS. -->
+        <link rel="alternate" type="application/rss+xml" title="Reflexive Reflection" href="http://reflexivereflection.com/rss.xml" />
+
+        <!-- Metadata. -->
+        <meta name="keywords" content="Anders Papitto, blog" />
+        <meta name="description" content="Blog of Anders Papitto." />
+    </head>
+
+
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-78768792-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_TRACKING_ID');
+    </script>
+
+
+    <body>
+        <div id="hideNavigation">
+            <button onclick="hideNavigation()">
+                 Hide Navigation
+            </a>
+        </div>
+        <div id="showNavigation" class="hidden">
+            <button onclick="showNavigation()">
+                 Show Navigation
+            </a>
+        </div>
+        <div id="navigation">
+            <h3>BLOG</h3>
+            <a href="../index.html">Home</a>
+            <a href="../posts.html">All Posts</a>
+            <a href="../contact.html">Contact</a>
+            <h3>HIGHLIGHTS</h3>
+            <a href="../tags/pseudopolis.html">Pseudopolis</a>
+            <h3>EXTERNAL</h3>
+            <a href="http://github.com/anderspapitto">GitHub</a>
+            <a href="http://twitter.com/anderspapitto">Twitter</a>
+            <a href="https://www.instagram.com/anderspapitto">Instagram</a>
+        </div>
+
+        <div id="content">
+    <h1>What the US government should do if Bitcoin wins</h1>
+<div class="soft">
+    It should disentangle the tech from the existing allocations.<br />
+    April  4, 2018 (<a href="../tags/cryptocurrency.html">cryptocurrency</a>, <a href="../tags/policy.html">policy</a>)
+</div>
+
+<p>Let’s imagine for a moment that Bitcoin looks like a complete success. It has some revolutionary new technology integrated, everyone has adopted it, and no one wants to use anything else any more.</p>
+<p>What would I, as a US citizen, like my government to do about it?</p>
+<p>I’d like them to fork Bitcoin - not the blockchain but the code - premine the whole thing, and then release it as a new alternative called DollarCoin.</p>
+<p>And then ban Bitcoin.</p>
+<p>DollarCoin should win pretty handily at that point. It’s a tie by symmetry on technical merits, and in one scenario there’s a legal option that everyone owns some of (indirectly, through the government), and in the other scenario there’s an illegal option in which almost everyone has zero money.</p>
+<p>Cryptocurrencies are two things, bundled together. They’re some new tech, which may or may not be useful, and they’re an unprecedented-ly unequal distribution of wealth.</p>
+<p>People who buy into them for the long term envision both that the technology wins out, and that the existing distribution is adopted. But these two things don’t have to be tied together. The rest of the world can adopt the tech, and simply discard the particular numbers that woud otherwise make the early adopters our new quadrillionaire overlords.</p>
+<p>As far as I know, nothing like that has ever happened. But also as far as I know, the world has never faced up to inequality where the %0.000001 has quite so many leading zeros.</p>
+
+
+    <div style="clear: both"></div>
+
+</div>
+
+
+        <script>
+            function hideNavigation() {
+                document.cookie = "hidden = true;"
+                document.getElementById("navigation").classList.add("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.add("hidden");
+                document.getElementById("showNavigation").classList.remove("hidden");
+            }
+            function showNavigation() {
+                document.cookie = "hidden = ; Max-Age=-99999999;";
+                document.getElementById("navigation").classList.remove("hiddenNavigation");
+                document.getElementById("hideNavigation").classList.remove("hidden");
+                document.getElementById("showNavigation").classList.add("hidden");
+            }
+            if (document.cookie) {
+                hideNavigation();
+            }
+        </script>
+    </body>
+</html>

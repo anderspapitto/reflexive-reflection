@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged economics</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/economics.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Sat, 07 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Free Markets Are Built on Free Labor</title>
+    <link>https://reflexivereflection.com/posts/2018-04-07-free-markets-are-built-on-free-labor.html</link>
+    <description><![CDATA[<p>Free computational labor, that is. Which may decline in importance.</p>
+<p>Let’s briefly look at why that is, how important that is, and what situations make that more or less true.</p>
+<p>Imagine you’re in charge. There’s a bunch of people, they can all do various things with various levels of competence.</p>
+<p>You can tell them all what to do, so what do you tell them? Well, one pretty good strategy is to let each one figure out for themselves. You have one brain and a few facts, they have hundreds of millions of brains and detailed knowledge of their own situations. Will they get it perfect? Well, no, but you weren’t going to either. Can you trust them to make good choices? Well, probably not entirely, but let’s say you pay them for how good their choices turn out, so they at least have a reason to make an honest effort.</p>
+<p>That’s a free market.</p>
+<p>When does it really shine?</p>
+<p>It really shines when people have diverse options, and they are many many times more efficient at some roles than others, and people are also substantially different from each other. You lose a lot of productivity if you mess up and Bill Gates doesn’t end up doing things with computers, because presumably</p>
+<pre><code>- making Microsoft is much better than many other options he had.
+- he&#39;s much better at making Microsoft than he is at doing other things.
+- other people aren&#39;t nearly as good at making Microsoft as him.</code></pre>
+<p>When any of those things isn’t true, then free markets are less good.</p>
+<p>If lots of people are good at making Microsoft, it doesn’t matter if Bill Gates does it or someone else does.</p>
+<p>If Bill Gates is as good at everything as he is at making Microsoft, then he can just make Apple instead, or discover DNA.</p>
+<p>If Bill Gates grows up as a peasant in the 1300’s, he’s not going to make Microsoft no matter what, so you lose less by having him just be a farmer.</p>
+<p>In particular, when a lot of work that needs to be done is more basic, like “grow lots of food” (like you might see in a developing country), or “make lots of guns” (like you might see during a war), there’s less benefit to free markets, and you might expect to see more central planning in those scenarios - and in fact you do.</p>
+<h2 id="this-time-its-different">This time it’s different</h2>
+<p>Here’s another scenario in which a free market is less useful. If computers get good enough at allocating humans, then there’s less need (efficiency-wise) for the humans to do that. Note that this isn’t the same as computers doing everyone’s job for them. Bill Gates can still found Microsoft, with his own fully-human decision-making - he just doesn’t have to be the one to decide that he will.</p>]]></description>
+    <pubDate>Sat, 07 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-07-free-markets-are-built-on-free-labor.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Trustworthy corporations</title>
+    <link>https://reflexivereflection.com/posts/2018-04-03-trustworthy-corporations.html</link>
+    <description><![CDATA[<p>This is an outline for how to construct a trustworthy corporation, in certain circumstances. Some parts need more fleshing out to be usable.</p>
+<p>Why does it matter? In the world we live in, large corporations produce a huge amount of value, and do many many useful things.</p>
+<p>There is a big downside though - large corporations aren’t trustworthy. They have a drive to be useful and efficient and innovative, but also a drive to be underhanded and manipulative and monopolistic, and both come from the same place - seeking for profit in a market economy.</p>
+<p>So, I’d like to find a way to keep that profit-based motivation for the good things - the efficiency and innovation - but eliminate it for the negative behaviors, to somehow arrange for what we would consider greed to not pay off.</p>
+<p>I don’t have a general solution - for reasons of my own, I’m only going to consider cases where there’s a simple, primary purpose to the corporation. For example, we could summarize Intel as “they build us CPUs”, or we could summarize Comcast as “they provide us with internet access”.</p>
+<p>The basic structure is to define an acceptable level of service and price. For example, for an internet provider that might be “100Mbps for $50/month”, indexed respectively to networking tech advancements and to general inflation.</p>
+<p>Then, rather than the traditional strategies of</p>
+<pre><code>- some government agency enforces this
+- hope the corporation plays nice
+- count on competition to keep them in line</code></pre>
+<p>which all have serious problems which you’re probably familar with and that I won’t go into here, we apply a novel enforcement mechanism.</p>
+<p>Every year, the corporation creates a new legal entity, a small spin-off that we’ll call “Enforcer”. Then, the corporation signs a very one-sided contract with Enforcer. The contract says that if the corporation doesn’t “play nice” (defining this with the appropriate rigor and level of abstraction is the biggest open question here, but I think it’s often possible), Enforcer can sue the corporation for 3x its profits that year. Also Enforcer gets access to the corporation’s internal communications and so forth during the suit, so if something shady is going on it can definitely find out.</p>
+<p>Then Enforcer gets auctioned off to the highest bidder, proceeds to charity or launched into the sun.</p>
+<p>And that’s basically it! So why does it work?</p>
+<p>It works because it changes the incentive curve for the corporation. It can still make a nice little profit by doing what it’s good at and charging a reasonable profit, and that’s fine. The problem before was that it had the option of making even more profit by being underhanded - but that’s no longer the case, because Enforcer is in the way. Now the choice is “be nice and make money OR be not nice and lose everything” - and I’m pretty ok with trusting faceless corporations to make that decision for themselves.</p>
+<p>Let’s dig into the Enforcer a little more, because this is pretty strange. Instead of making the corporation answerable to the government, or to its customers, we make it responsible to some arbitrary third party - whoever feels like buying up Enforcer at auction. Who would that be? Well, probably your favorite Wall Street boogeyman. Some other rich, profit-seeking corporation, with lots of resources and highly-paid lawyers, is going to buy Enforcer, and they’re going to be super aggressive about rooting out bad behavior - because there’s a ton of money in it.</p>
+<p>So we’ve basically constructed a customized regulator, which is profit-driven to regulate effectively, and is bootstrapped on top of the court system as a source of relatively even-handed arbitration that’s subject to neither regulatory capture nor populist mob mentalities.</p>
+<p>It’s a little unfortunate that in the event of some transgression, it won’t be the wronged parties who get the payment money, but rather whoever bought Enforcer. I can live with that though, because it’s better to arrange for transgressions to be few and far between, than to arrange for them to happen all the time and try to make up for it with reparations.</p>
+<p>To summarize</p>
+<pre><code>- this is immune to regulatory capture
+- it causes the corporation to want to be nice, not to want to be only as greedy as it can get away with
+- this doesn&#39;t require any laws passed or government support, aside from a court system</code></pre>
+<p>And there’s one last big question - why would the corporation ever agree to this? This is a topic I may get deeper into another time, but it boils down to the expectation of more engagement as a result of promising, in a very concrete way, to play nice.</p>
+<p>To see prior art of this dynamic playing out, look at free software, for example Linux. Open-source software is very similarly a one-sided promise to play nice (effectively the creators give you a license to use it without asking for anything in return). The payback is that people are much more willing to use and contribute to these projects.</p>
+<p>So it would probably be adopted by a new entrant to some market that can use the I-play-nice guarantee to attract engagement, rather than being retrofitted onto some corporation that is already dominant.</p>]]></description>
+    <pubDate>Tue, 03 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-03-trustworthy-corporations.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

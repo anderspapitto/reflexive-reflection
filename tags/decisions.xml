@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged decisions</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/decisions.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Thu, 12 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Good decisions are expensive</title>
+    <link>https://reflexivereflection.com/posts/2018-04-12-good-decisions-are-expensive.html</link>
+    <description><![CDATA[<p>I think a lot of discourse tends to be off the mark because the immense difficulty of making good, high-quality decisions isn’t appreciated.</p>
+<p>My favorite example for this is borrowed from Kahneman’s book Thinking Fast and Slow. He introduced it to make a different point, but what I got out of it is that even in some of the simplest circumstances, being correct is so difficult and tricky that it’s unreasonable to expect it from anyone.</p>
+<p>This scenario is this. There’s an military instructor, teaching students to fly airplanes. As part of the training, he goes up with the students on test flights. Sometimes they do well, sometimes they do poorly, and he gives them praise or criticism appropriately.</p>
+<p>So far, so good. Now, after a while, being very careful and observant, he starts to notice a pattern.</p>
+<p>Whenever he gives praise, the students do worse afterwards. And whenever he criticizes them, they improve. And this pattern just won’t go away, even after he starts writing it all down at tracking it.</p>
+<p>So, in the end, after a lot of thought, he reaches the only reasonable conclusion: praise hurts the students performance, and criticism helps it. So the correct thing to do is to stop praising students, and ramp up the criticism.</p>
+<p>The only problem is that this is 100% completely dead wrong. If you haven’t heard this one before, I encourage you to try to do better and figure out why.</p>
+<p>Before we get into the answer, let’s unpack the situation.</p>
+<ul>
+<li>this instructor is a well-qualified expert in his field</li>
+<li>this is really important to him</li>
+<li>it’s actually a very simple scenario</li>
+<li>he’s super careful</li>
+<li>he’s thinking as hard as he can</li>
+<li>his observations are correct. students really do get worse after praise, and better after criticism. He’s just wrong about why.</li>
+</ul>
+<p>On the whole, I don’t fault this instructor in the slightest for getting this one wrong. He’s not dumb or lazy or uninterested or biased or trying something too ambitious. Making correct decisions is just Really Hard.</p>
+<p>So, here’s what’s really going on - <a href="https://en.wikipedia.org/wiki/Regression_toward_the_mean">regression to the mean</a>. Basically, how well a student flies on any particular day is a combination of skill and luck (maybe 30/70, 50/50, 95/5 - doesn’t matter for our purposes).</p>
+<p>When the instructor gives out praise, it’s after really good performances. The best performances will be, for the most part, lucky. And likewise criticism will be given after performances that are more unlucky than usual.</p>
+<p>The key characteristic of luck though, is that it doesn’t stick around. The next day, when the student goes up in the air again, they’ll have the same skill as before, but on average they’ll have average luck. If they were lucky the day before (and got praised for it), they’ll do worse, because average luck is worse than good luck. If they were unlucky the day before (and got criticized for it), they’ll do better, because average luck is better than bad luck.</p>
+<p>There’s more to say on it, but that’s the overview and there’s no point in me parroting the whole wikipedia article. (Interesting tidbit though - this is also how placebos “work” in medicine).</p>
+<p>For our purposes, the important thing here is that it’s not the instructors fault that he doesn’t know about this obscure statistical trap. So unless and until we live in a world where people consult their local statisticians before daring to say “good job out there today”, we have to recognize that decisions are difficult.</p>]]></description>
+    <pubDate>Thu, 12 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-12-good-decisions-are-expensive.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Free Markets Are Built on Free Labor</title>
+    <link>https://reflexivereflection.com/posts/2018-04-07-free-markets-are-built-on-free-labor.html</link>
+    <description><![CDATA[<p>Free computational labor, that is. Which may decline in importance.</p>
+<p>Let’s briefly look at why that is, how important that is, and what situations make that more or less true.</p>
+<p>Imagine you’re in charge. There’s a bunch of people, they can all do various things with various levels of competence.</p>
+<p>You can tell them all what to do, so what do you tell them? Well, one pretty good strategy is to let each one figure out for themselves. You have one brain and a few facts, they have hundreds of millions of brains and detailed knowledge of their own situations. Will they get it perfect? Well, no, but you weren’t going to either. Can you trust them to make good choices? Well, probably not entirely, but let’s say you pay them for how good their choices turn out, so they at least have a reason to make an honest effort.</p>
+<p>That’s a free market.</p>
+<p>When does it really shine?</p>
+<p>It really shines when people have diverse options, and they are many many times more efficient at some roles than others, and people are also substantially different from each other. You lose a lot of productivity if you mess up and Bill Gates doesn’t end up doing things with computers, because presumably</p>
+<pre><code>- making Microsoft is much better than many other options he had.
+- he&#39;s much better at making Microsoft than he is at doing other things.
+- other people aren&#39;t nearly as good at making Microsoft as him.</code></pre>
+<p>When any of those things isn’t true, then free markets are less good.</p>
+<p>If lots of people are good at making Microsoft, it doesn’t matter if Bill Gates does it or someone else does.</p>
+<p>If Bill Gates is as good at everything as he is at making Microsoft, then he can just make Apple instead, or discover DNA.</p>
+<p>If Bill Gates grows up as a peasant in the 1300’s, he’s not going to make Microsoft no matter what, so you lose less by having him just be a farmer.</p>
+<p>In particular, when a lot of work that needs to be done is more basic, like “grow lots of food” (like you might see in a developing country), or “make lots of guns” (like you might see during a war), there’s less benefit to free markets, and you might expect to see more central planning in those scenarios - and in fact you do.</p>
+<h2 id="this-time-its-different">This time it’s different</h2>
+<p>Here’s another scenario in which a free market is less useful. If computers get good enough at allocating humans, then there’s less need (efficiency-wise) for the humans to do that. Note that this isn’t the same as computers doing everyone’s job for them. Bill Gates can still found Microsoft, with his own fully-human decision-making - he just doesn’t have to be the one to decide that he will.</p>]]></description>
+    <pubDate>Sat, 07 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-07-free-markets-are-built-on-free-labor.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>

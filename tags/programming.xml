@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>Reflexive Reflection - Posts tagged programming</title>
+        <link>https://reflexivereflection.com</link>
+        <description><![CDATA[A blog by Anders Papitto]]></description>
+        <atom:link href="https://reflexivereflection.com/tags/programming.xml" rel="self"
+                   type="application/rss+xml" />
+        <lastBuildDate>Wed, 11 Apr 2018 00:00:00 UT</lastBuildDate>
+        <item>
+    <title>Adversarial prioritization</title>
+    <link>https://reflexivereflection.com/posts/2018-04-11-adversarial-prioritization.html</link>
+    <description><![CDATA[<p>A pretty common thing in your task tracker is that everything ends up either at the highest priority or otherwise completely ignored. I’m sure there’s some psychology or game theory aspects to it, but basically whatever you happen to be triaging at the moment always has an urgent feel to it, and the whole prioritization system ends up useless.</p>
+<p>Here’s an idea: rather than you manually assigning an absolute high/middle/low priority tag to each of your thousands of tasks, your task-tracking system can pick two tasks, show them to you, and say “which one is more important?”. And then do that maybe ten times per day. Then the system can automatically derive not just arbitrary high/mid/low tags, but a full absolute ranking to the whole dataset. Clearly there can be conflicting answers or cycles or importances that change over time - but a sufficiently flexible system should be able to handle all of that quite well.</p>]]></description>
+    <pubDate>Wed, 11 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-11-adversarial-prioritization.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Amdahl's Law of Frustration</title>
+    <link>https://reflexivereflection.com/posts/2018-04-08-amdahls-law-of-frustration.html</link>
+    <description><![CDATA[<p>This post is some over-analysis to reach a pretty obvious conclusion: It makes sense to fix the really terrible parts of your workflow, but be very careful of going overboard.</p>
+<p>The programming workflow has a very nice property: since the tools you use are mostly software, and since you write software, whenever something is slow or annoying, you can go in and fix it for yourself.</p>
+<p>This isn’t always practical - for example, if compilation is really slow, most people don’t have the expertise to dig into the guts of LLVM and come up with a 50% speedup. However, there’s often an approachable angle. Rather than fixing the compiler, maybe rewrite the slowest-to-compile chunks of the codebase.</p>
+<p>Let’s say you succeed, and your time usage goes from looking like this</p>
+<p><img src="../images/initial_time_breakdown.svg" /></p>
+<p>to this</p>
+<p><img src="../images/second_time_breakdown.svg" /></p>
+<p>And since that was such a great success, let’s say you go through this a couple more times, until you reach this</p>
+<p><img src="../images/final_time_breakdown.svg" /></p>
+<p>and by now, the time cost of improving the workflow is getting high enough that it doesn’t really make sense to go any deeper. So, what have you accomplished?</p>
+<p>Well, you’ve made your time something like TODO% more efficient, which is great. But on the other hand, there’s still a problem. You’re spending TODO% of your time, the biggest chunk of it, on a annoying, repetitive task. This didn’t come out of nowhere - you had to do the same thing before all these improvements, but at the time it was overshadowed by enough other stuff that it wasn’t really a problem.</p>
+<p>So basically, you can fix the slowest and most annoying parts of your workflow, but whether you do or not, but you’ll end up still spending a bunch of time on the slowest and most annoying things - because that’s always defined relative to where you’ve ended up, not relative to the more-broken situation where you started.</p>
+<p>* Maybe I should instead title this The Hedonism Treadmill of Nuisance? But that’s not quite right either.</p>]]></description>
+    <pubDate>Sun, 08 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-08-amdahls-law-of-frustration.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Disabling emacs window management</title>
+    <link>https://reflexivereflection.com/posts/2018-04-06-disabling-emacs-window-management.html</link>
+    <description><![CDATA[<p>I use Emacs, which is mostly great. However I also use <a href="https://i3wm.org">i3</a>, a tiling window manager, and there’s a little bit of overlap. Emacs can split frames into multiple windows and shuffle things around - but so can i3, and in fact that’s specifically what i3 is built for.</p>
+<p>I resolve this tension pretty heavy-handedly. I use only i3 for placing windows. Emacs is stripped of all power to split frames.</p>
+<p>Here’s how I get emacs to behave (annotated from <a href="https://github.com/anderspapitto/nixos-configuration/blob/master/config/init.el">my init.el</a>.</p>
+<p>The main part is configuring <code>display-buffer-alist</code>, which controls what happens when emacs wants to display a buffer.</p>
+<pre><code>(setq display-buffer-alist
+      &#39;((&quot;shell.*&quot; (display-buffer-same-window) ())
+        (&quot;.*&quot; (display-buffer-reuse-window
+               display-buffer-same-window
+               display-buffer-pop-up-frame)
+         (reusable-frames . t))))</code></pre>
+<p>This tells emacs to always raise an existing window that’s already displaying the buffer, if one exists, and otherwise to display it in the current window. There’s a slight exception for shells - when I switch to them I want them to always display in the current window, even if there’s another frame somewhere already displaying them.</p>
+<p>I override <code>display-buffer-pop-up-window</code>, which is used by some code that really wants to split the window (for example displaying grep results), to instead use the whole thing.</p>
+<pre><code>(defun anders/same-window-instead
+    (orig-fun buffer alist)
+  (display-buffer-same-window buffer nil))
+(advice-add &#39;display-buffer-pop-up-window :around &#39;anders/same-window-instead)</code></pre>
+<p>I’ve forgotten exactly what this does - but I think it tells emacs to switch to the frame that’s already displaying whatever I want to look at, if such a frame exists.</p>
+<pre><code>(defun anders/do-select-frame (orig-fun buffer &amp;rest args)
+  (let* ((old-frame (selected-frame))
+         (window (apply orig-fun buffer args))
+         (frame (window-frame window)))
+    (unless (eq frame old-frame)
+      (select-frame-set-input-focus frame))
+    (select-window window)
+    window))
+(advice-add &#39;display-buffer :around &#39;anders/do-select-frame)</code></pre>
+<p>I make transient frames (I have certain utilities that pop up a temporary frame) go away entirely when they’re done.</p>
+<pre><code>(setq frame-auto-hide-function &#39;delete-frame)</code></pre>
+<p>I completely neuter dedicated window functionality. I don’t need it, since I’m explicitly controlling all window placement anyways, and dedicated windows override a bunch of behavior and break all the other customizations.</p>
+<pre><code>(advice-add &#39;set-window-dedicated-p :around
+            (lambda (orig-fun &amp;rest args) nil))</code></pre>
+<p>There are also some package-specific fixes.</p>
+<p>Org mode</p>
+<pre><code>  (setq org-agenda-window-setup &#39;current-window)</code></pre>
+<p>Gdb</p>
+<pre><code>(setq gdb-display-io-nopopup t)</code></pre>
+<p>Compile. <code>compilation-goto-locus</code> (for jumping to compile errors or grep results) is a huge offender here. It overrides <code>display-buffer-alist</code> with a <code>let</code> binding deep inside it’s internals. There’s nothing for it but to override the whole function with a stripped-down version (still pretty long but look at the original - it’s a real beast).</p>
+<pre><code>  (defun compilation-goto-locus (msg mk end-mk)
+    &quot;Jump to an error corresponding to MSG at MK.
+All arguments are markers.  If END-MK is non-nil, mark is set there
+and overlay is highlighted between MK and END-MK.&quot;
+
+    (display-buffer (marker-buffer msg) &#39;(nil (allow-no-window . t)))
+    (with-current-buffer (marker-buffer msg)
+      (goto-char (marker-position msg))
+      (and w (compilation-set-window w msg)))
+
+    (display-buffer (marker-buffer mk))
+
+    (with-current-buffer (marker-buffer mk)
+      (unless (eq (goto-char mk) (point))
+        ;; If narrowing gets in the way of going to the right place, widen.
+        (widen)
+        (if next-error-move-function
+            (funcall next-error-move-function msg mk)
+          (goto-char mk)))
+      (if end-mk
+          (push-mark end-mk t)
+        (if mark-active (setq mark-active)))
+      ;; If hideshow got in the way of
+      ;; seeing the right place, open permanently.
+      (dolist (ov (overlays-at (point)))
+        (when (eq &#39;hs (overlay-get ov &#39;invisible))
+          (delete-overlay ov)
+          (goto-char mk))))))</code></pre>
+<p>And as a complement to that, rust-mode tries to get fancy with jumping to compile errors. Undo that too.</p>
+<pre><code>  (eval-after-load &#39;compile
+    (remove-hook &#39;next-error-hook &#39;rustc-scroll-down-after-next-error)))</code></pre>
+<p>There’s probably more interactions I’ll discover with various packages, but on the whole this has been working for me quite well.</p>]]></description>
+    <pubDate>Fri, 06 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-06-disabling-emacs-window-management.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+<item>
+    <title>Fixing problems in passing</title>
+    <link>https://reflexivereflection.com/posts/2018-04-02-fixing-problems-in-passing.html</link>
+    <description><![CDATA[<p>Sometimes a problem shows up, and it’s easy to figure out a straightforward solution. So - should you go ahead and fix that problem with that solution? Sometimes yes, sometimes no. I’m going to explore some of the “no” situations.</p>
+<p>I claim that you should be reluctant to engage with a problem directly when it’s possible to fix it “in passing”, or in other words when you can focus on something else that just happens to make the problem go away, or be less severe.</p>
+<p>Let’s look at a few examples.</p>
+<p>This is super common with technology. Technology always has imperfections, can always be fixed and improved in small ways. Also, technology tends to go obsolete and get replaced with something much better - and anytime you can avoid fixing problems with something that’s about to be obsolete, it’s a big advantage.</p>
+<p>Example 1 - Printers. They could be faster, cheaper, more efficient, jam less, be simpler, etc. etc. Also, all of that matters a whole lot less now that email exists than it did before. So - not entirely, but largely - building better printers is a bad use of time relative to inventing the internet.</p>
+<p>This can also apply at the intersection between technology and lots of other things, like ethics.</p>
+<p>Example 2 - Eating meat. There’s some moral arguments against killing animals for food. A straightforward solution, that could work with enough effort, is to convince many many people to stop eating meat. An indirect solution, which could fix this in passing, is to figure out how to make lab-grown meat that’s just as good and much cheaper. This might fix 90% of the problem with 2% of the people-convincing effort.</p>
+<p>Or it can apply in pure politics</p>
+<p>Example 3 - One form of accepted corruption in the US is that police get get-out-of-traffic-ticket-free cards to hand out to friends/family/etc. The direct solution is to demand reform, and have some enforcer make sure this doesn’t happen. An in-passing solution is to invest in public transit and self driving cars, so that speeding tickets become a thing of the past, and take related corruption with them.</p>
+<p>Or it can apply in some personal efforts.</p>
+<p>Example 4 - If I can do five pushups and would like to do twenty, I can do some pushups every day until I get much stronger. Or, I can lose 40 pounds and that might do the trick on it’s own, or get me most of the way there.</p>
+<p>Example 5 - If I find out my boss is underpaying me, the straightforward approach is to negotiate for more money, or to go out and interview for a higher-paying job. An in-passing solution might be to go to med school.</p>
+<p>So, overall nothing novel but I like it as a principle that connects these type of situations.</p>
+<p>In general, if I know that it’s possible to alleviate a problem by making some more-general situation better, I’ll be skeptical of tackling the more specific problem head-on. Though of course it’s not an absolute.</p>]]></description>
+    <pubDate>Mon, 02 Apr 2018 00:00:00 UT</pubDate>
+    <guid>https://reflexivereflection.com/posts/2018-04-02-fixing-problems-in-passing.html</guid>
+    <dc:creator>Anders Papitto</dc:creator>
+</item>
+
+    </channel>
+</rss>
